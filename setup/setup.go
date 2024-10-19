@@ -23,6 +23,11 @@ func createPassword(l int) string {
 	return password
 }
 
+func exit(e error) {
+	fmt.Printf("%v\n", e)
+	os.Exit(1)
+}
+
 func main() {
 	fmt.Println("connecting to database")
 
@@ -38,14 +43,14 @@ func main() {
 
 	db, err := sql.Open("mysql", sqlConfig.FormatDSN())
 	if err != nil {
-		panic(err)
+		exit(err)
 	}
 
 	// load the sql-script
 	fmt.Println(`reading "setup.sql"`)
 	var sqlScriptCommands []byte
 	if c, err := os.ReadFile("setup.sql"); err != nil {
-		panic(err)
+		exit(err)
 	} else {
 		sqlScriptCommands = c
 	}
@@ -53,7 +58,7 @@ func main() {
 	// read the currently availabe tables
 	fmt.Println("reading available tables in database")
 	if rows, err := db.Query("SHOW TABLES"); err != nil {
-		panic(err)
+		exit(err)
 	} else {
 		defer rows.Close()
 
@@ -62,15 +67,15 @@ func main() {
 			var name string
 
 			if err := rows.Scan(&name); err != nil {
-				panic(err)
+				exit(err)
 			} else {
 				// check wether for the table there exists a create command
 
 				if match, err := regexp.Match(fmt.Sprintf(`(?i)^create table %s`, name), sqlScriptCommands); err != nil {
-					panic(err)
+					exit(err)
 				} else {
 					if match {
-						panic(fmt.Errorf("can't setup databases: table %q already exists", name))
+						exit(fmt.Errorf("can't setup databases: table %q already exists", name))
 					}
 				}
 			}
@@ -91,13 +96,13 @@ func main() {
 
 	// hash the admin-password
 	if passwordHash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost); err != nil {
-		panic(err)
+		exit(err)
 	} else {
 		fmt.Println("\thashed password")
 
 		// create an admin-user
 		if _, err := db.Exec("INSERT INTO users (name, password) VALUES ('admin', ?)", passwordHash); err != nil {
-			panic(err)
+			exit(err)
 		}
 
 		fmt.Println("\twrote hashed password to database")
