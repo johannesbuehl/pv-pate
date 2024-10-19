@@ -24,6 +24,8 @@ func createPassword(l int) string {
 }
 
 func main() {
+	fmt.Println("connecting to database")
+
 	// connect to the database
 	sqlConfig := mysql.Config{
 		AllowNativePasswords: true,
@@ -34,11 +36,13 @@ func main() {
 		DBName:               config.Database.Database,
 	}
 
-	db, _ := sql.Open("mysql", sqlConfig.FormatDSN())
-
-	// only proceed if the tables don't exists
+	db, err := sql.Open("mysql", sqlConfig.FormatDSN())
+	if err != nil {
+		panic(err)
+	}
 
 	// load the sql-script
+	fmt.Println(`reading "setup.sql"`)
 	var sqlScriptCommands []byte
 	if c, err := os.ReadFile("setup.sql"); err != nil {
 		panic(err)
@@ -47,11 +51,13 @@ func main() {
 	}
 
 	// read the currently availabe tables
+	fmt.Println("reading available tables in database")
 	if rows, err := db.Query("SHOW TABLES"); err != nil {
 		panic(err)
 	} else {
 		defer rows.Close()
 
+		fmt.Println("checking for already existing tables in database")
 		for rows.Next() {
 			var name string
 
@@ -64,8 +70,7 @@ func main() {
 					panic(err)
 				} else {
 					if match {
-						fmt.Printf("can't setup databases: table %q already exists", name)
-						os.Exit(1)
+						panic(fmt.Errorf("can't setup databases: table %q already exists", name))
 					}
 				}
 			}
@@ -73,9 +78,12 @@ func main() {
 	}
 
 	// everything is good (so far), create the tables
+	fmt.Println("Creating the individual tables:")
 	for _, cmd := range strings.Split(string(sqlScriptCommands), "\n") {
 		db.Exec(cmd)
 	}
+
+	fmt.Println("Creating admin-password:")
 
 	// create an admin-password
 	const passwordLength = 20
@@ -85,13 +93,17 @@ func main() {
 	if passwordHash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost); err != nil {
 		panic(err)
 	} else {
+		fmt.Println("\thashed password")
+
 		// create an admin-user
 		if _, err := db.Exec("INSERT INTO users (name, password) VALUES ('admin', ?)", passwordHash); err != nil {
 			panic(err)
 		}
+
+		fmt.Println("\twrote hashed password to database")
 	}
 
-	fmt.Printf(`created user "admin" with password %s`, password)
+	fmt.Printf("created user \"admin\" with password %s\n", password)
 
 	// create a jwt-signature
 	config.ClientSession.JwtSignature = createPassword(100)
