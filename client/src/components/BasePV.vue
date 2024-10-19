@@ -39,7 +39,7 @@
 
 	const svg = ref<string>();
 
-	const svg_path = "elements.svg";
+	const svg_path = "elements/elements.svg";
 
 	const svg_wrapper = ref<HTMLDivElement>();
 	const tooltip = ref<HTMLDivElement>();

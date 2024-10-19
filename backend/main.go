@@ -653,6 +653,39 @@ func postUsers(c *fiber.Ctx) responseMessage {
 	return response
 }
 
+// change the password in the database
+func changePassword(uid int, password string) responseMessage {
+	response := responseMessage{}
+
+	// hash the new password
+	if hashedPassword, err := hashPassword(password); err != nil {
+		response.Status = fiber.StatusInternalServerError
+
+		logger.Error().Msgf("can't hash password: %v", err)
+	} else {
+		// increase the token-id of the user to make the current-token invalid
+		if err := incTokenId(uid); err != nil {
+			response.Status = fiber.StatusInternalServerError
+
+			logger.Error().Msgf("can't increase the tid: %v", err)
+		} else {
+			// update the databse with the new password
+			if err := dbUpdate("users", struct{ Password []byte }{Password: hashedPassword}, struct{ Uid int }{Uid: uid}); err != nil {
+				response.Status = fiber.StatusInternalServerError
+				response.Message = "can't update password"
+
+				logger.Error().Msgf("can't update password: %v", err)
+			} else {
+				logger.Debug().Msgf("updated password for user %q", uid)
+
+				response.Status = fiber.StatusOK
+			}
+		}
+	}
+
+	return response
+}
+
 // handles patch-request to change a useres password
 func patchUsers(c *fiber.Ctx) responseMessage {
 	response := responseMessage{}
@@ -698,30 +731,8 @@ func patchUsers(c *fiber.Ctx) responseMessage {
 				} else {
 					// everything is valid
 
-					// hash the new password
-					if hashedPassword, err := hashPassword(body.Password); err != nil {
-						response.Status = fiber.StatusInternalServerError
-
-						logger.Error().Msgf("can't hash password: %v", err)
-					} else {
-						// increase the token-id of the user to make the current-token invalid
-						if _, err := incTokenId(uid); err != nil {
-							response.Status = fiber.StatusInternalServerError
-
-							logger.Error().Msgf("can't increase the tid: %v", err)
-						} else {
-							// update the databse with the new password
-							if err := dbUpdate("users", struct{ Password []byte }{Password: hashedPassword}, struct{ Uid int }{Uid: uid}); err != nil {
-								response.Status = fiber.StatusInternalServerError
-								response.Message = "can't update password"
-
-								logger.Error().Msgf("can't update password: %v", err)
-							} else {
-								logger.Debug().Msgf("updated password for user %q", uid)
-
-								response = getUsers(c)
-							}
-						}
+					if response = changePassword(uid, body.Password); response.Status == fiber.StatusOK {
+						response = getUsers(c)
 					}
 				}
 			}
@@ -798,31 +809,9 @@ func patchUserPassword(c *fiber.Ctx) responseMessage {
 
 			logger.Info().Msg("invalid password")
 		} else {
-			// hash the new password
-			if hashedPassword, err := hashPassword(body.Password); err != nil {
-				response.Status = fiber.StatusInternalServerError
+			// everything is valid
 
-				logger.Error().Msgf("can't hash password: %v", err)
-			} else {
-				// increase the token-id of the user to make the current-token invalid
-				if _, err := incTokenId(uid); err != nil {
-					response.Status = fiber.StatusInternalServerError
-
-					logger.Error().Msgf("can't increase tid: %v", err)
-				} else {
-					// update the databse with the new password
-					if err := dbUpdate("users", struct{ Password []byte }{Password: hashedPassword}, struct{ Uid int }{Uid: uid}); err != nil {
-						response.Status = fiber.StatusInternalServerError
-						response.Message = "can't update password"
-
-						logger.Error().Msgf("can't update password: %v", err)
-					} else {
-						logger.Debug().Msgf("updated password for user with uid = %q", uid)
-
-						response = getUsers(c)
-					}
-				}
-			}
+			return changePassword(uid, body.Password)
 		}
 	}
 
@@ -903,16 +892,10 @@ func getTokenId(uid int) (int, error) {
 }
 
 // increases the tid of a user
-func incTokenId(uid int) (int, error) {
-	if tid, err := getTokenId(uid); err != nil {
-		return -1, err
-	} else {
-		if err := dbUpdate("users", struct{ Tid int }{Tid: tid}, struct{ Uid int }{Uid: uid}); err != nil {
-			return -1, err
-		} else {
-			return tid, nil
-		}
-	}
+func incTokenId(uid int) error {
+	_, err := db.Exec("UPDATE users SET tid = tid + 1 WHERE uid = ?", uid)
+
+	return err
 }
 
 var messageWrongLogin = "Unkown user or wrong password"
@@ -957,10 +940,14 @@ func handleLogin(c *fiber.Ctx) error {
 				logger.Debug().Msgf("can't login: wrong username or password")
 			} else {
 				// get the token-id
-				if tid, err := incTokenId(user.Uid); err != nil {
+				if err := incTokenId(user.Uid); err != nil {
 					response.Status = fiber.StatusInternalServerError
 
-					logger.Error().Msgf("can't get a new tid for user with uid = %q", user.Uid)
+					logger.Error().Msgf("can't increase tid for user with uid = %q", user.Uid)
+				} else if tid, err := getTokenId(user.Uid); err != nil {
+					response.Status = fiber.StatusInternalServerError
+
+					logger.Error().Msgf("can't get tid for user with uid = %q", user.Uid)
 				} else {
 					// create the jwt
 					jwt, err := config.signJWT(JWTPayload{
