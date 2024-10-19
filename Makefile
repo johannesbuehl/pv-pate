@@ -12,7 +12,7 @@ client:
 
 init:
 	@echo "creating \"backend/config.yaml\""
-	cp -n backend/example-config.yaml backend/config.yaml
+	@cp -n backend/example-config.yaml backend/config.yaml
 
 setup:
 	@echo "running setup"
