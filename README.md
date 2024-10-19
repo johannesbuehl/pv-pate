@@ -1,12 +1,1 @@
-# todo
-## backend
-- more logging
-- setup-script
-- error-messages for client-popup
-
-## frontend
-- move styling to central variables
-
-# password-rules
-- min-length: 12
-- max-length: 64
+Source-code for the fundraising-website of our photovoltaic-system
