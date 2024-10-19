@@ -18,16 +18,20 @@ import (
 	"golang.org/x/text/language"
 )
 
+// connection to database
 var db *sql.DB
 
+// cache for database
 var dbCache *cache.Cache
 
+// general message for REST-responses
 type responseMessage struct {
 	Status  int
-	Message *string
+	Message string
 	Data    any
 }
 
+// query the database
 func dbSelect[T any](table string, where string, args ...any) ([]T, error) {
 	// validate columns against struct T
 	tType := reflect.TypeOf(new(T)).Elem()
@@ -46,6 +50,7 @@ func dbSelect[T any](table string, where string, args ...any) ([]T, error) {
 		}
 	}
 
+	// create the query
 	completeQuery := fmt.Sprintf("SELECT %s FROM %s", strings.Join(columns, ", "), table)
 
 	if where != "" && where != "*" {
@@ -113,6 +118,7 @@ func dbSelect[T any](table string, where string, args ...any) ([]T, error) {
 	}
 }
 
+// insert data intot the databse
 func dbInsert(table string, vals any) error {
 	// extract columns from vals
 	v := reflect.ValueOf(vals)
@@ -143,6 +149,7 @@ func dbInsert(table string, vals any) error {
 	return err
 }
 
+// update data in the database
 func dbUpdate(table string, set, where any) error {
 	setV := reflect.ValueOf(set)
 	setT := setV.Type()
@@ -189,6 +196,7 @@ func dbUpdate(table string, set, where any) error {
 	return err
 }
 
+// remove data from the database
 func dbDelete(table string, vals any) error {
 	// extract columns from vals
 	v := reflect.ValueOf(vals)
@@ -216,37 +224,47 @@ func dbDelete(table string, vals any) error {
 	return err
 }
 
+// answer the client request with the response-message
 func (result responseMessage) send(c *fiber.Ctx) error {
+	// if the status-code is in the error-region, return an error
 	if result.Status >= 400 {
-		if result.Message != nil {
-			return fiber.NewError(result.Status, *result.Message)
+		// if available, include the message
+		if result.Message != "" {
+			return fiber.NewError(result.Status, result.Message)
 		} else {
 			return fiber.NewError(result.Status)
 		}
 	} else {
+		// if there is data, send it as JSON
 		if result.Data != nil {
 			c.JSON(result.Data)
-		} else {
-			if result.Message != nil {
-				c.SendString(*result.Message)
-			}
+
+			// if there is a message, send it instead
+		} else if result.Message != "" {
+			c.SendString(result.Message)
 		}
 
 		return c.SendStatus(result.Status)
 	}
 }
 
+// payload of the JSON webtoken
 type JWTPayload struct {
 	Uid int `json:"uid"`
 	Tid int `json:"tid"`
 }
 
+// complete JSON webtoken
 type JWT struct {
 	Payload
 	CustomClaims JWTPayload
 }
 
+// extracts the json webtoken from the request
+//
+// @returns (uID, tID, error)
 func extractJWT(c *fiber.Ctx) (int, int, error) {
+	// get the session-cookie
 	cookie := c.Cookies("session")
 
 	token, err := jwt.ParseWithClaims(cookie, &JWT{}, func(token *jwt.Token) (any, error) {
@@ -261,6 +279,7 @@ func extractJWT(c *fiber.Ctx) (int, int, error) {
 		return -1, -1, err
 	}
 
+	// extract the claims from the JWT
 	if claims, ok := token.Claims.(*JWT); ok && token.Valid {
 		return claims.CustomClaims.Uid, claims.CustomClaims.Tid, nil
 	} else {
@@ -268,6 +287,7 @@ func extractJWT(c *fiber.Ctx) (int, int, error) {
 	}
 }
 
+// checks wether the request is from a valid user
 func checkUser(c *fiber.Ctx) (bool, error) {
 	uid, tid, err := extractJWT(c)
 
@@ -275,15 +295,18 @@ func checkUser(c *fiber.Ctx) (bool, error) {
 		return false, nil
 	}
 
+	// retrieve the user from the database
 	response, err := dbSelect[UserDB]("users", "uid = ? LIMIT 1", uid)
 
 	if err != nil {
 		return false, err
 	}
 
+	// if exactly one user came back and the tID is valid, the user is authorized
 	return len(response) == 1 && response[0].Tid == tid, err
 }
 
+// checks wether the request is from the admin
 func checkAdmin(c *fiber.Ctx) (bool, error) {
 	uid, tid, err := extractJWT(c)
 
@@ -291,12 +314,14 @@ func checkAdmin(c *fiber.Ctx) (bool, error) {
 		return false, err
 	}
 
+	// retrieve the user from the database
 	response, err := dbSelect[UserDB]("users", "uid = ? LIMIT 1", uid)
 
 	if err != nil {
 		return false, err
 	}
 
+	// if exactly one user came back and its name is "admin", the user is the admin
 	if len(response) != 1 {
 		return false, fmt.Errorf("user doesn't exist")
 	} else {
@@ -304,15 +329,18 @@ func checkAdmin(c *fiber.Ctx) (bool, error) {
 	}
 }
 
+// information about an element in the database
 type ElementDB struct {
 	Mid  string `json:"mid"`
 	Name string `json:"name"`
 }
 
+// client-data of the reserved elements
 type ClientStatus struct {
 	ReservedElements map[string]string `json:"reserved_elements"`
 }
 
+// caches the elements from the database
 func cacheElements() error {
 	if res, err := dbSelect[ElementDB]("elements", "*"); err != nil {
 		return err
@@ -329,6 +357,7 @@ func cacheElements() error {
 	}
 }
 
+// gets the elements from the cache
 func getElements(c *fiber.Ctx) responseMessage {
 	response := responseMessage{}
 
@@ -337,10 +366,12 @@ func getElements(c *fiber.Ctx) responseMessage {
 	if !found {
 		if err := cacheElements(); err != nil {
 			response.Status = fiber.StatusInternalServerError
+			response.Message = "can't get elements"
 
-			logger.Error().Msgf("can't get element from database: %v", err)
+			logger.Error().Msgf("can't get elements from database: %v", err)
 		} else if elements, found = dbCache.Get("elements"); !found {
 			response.Status = fiber.StatusInternalServerError
+			response.Message = "can't get elements"
 
 			logger.Error().Msg("can't get 'elements' from cache")
 		}
@@ -349,32 +380,48 @@ func getElements(c *fiber.Ctx) responseMessage {
 	response.Data = ClientStatus{
 		ReservedElements: elements.(map[string]string),
 	}
+
+	logger.Debug().Msg("retrieved elements")
+
 	return response
 }
 
+// regex to match valid element-names
 var midRegex = regexp.MustCompile(`^(?:pv-\w|(?:wr|bs)-)\d{1,2}$`)
 
+// handles post-requests for reserving new elements
 func postElements(c *fiber.Ctx) responseMessage {
 	response := responseMessage{}
 
 	if user, err := checkUser(c); err != nil {
 		response.Status = fiber.StatusInternalServerError
+
+		logger.Error().Msgf("can't check user: %v", err)
 	} else if !user {
 		response.Status = fiber.StatusUnauthorized
+
+		logger.Info().Msg("request is not authorized as user")
 	} else {
 		body := struct{ Name string }{}
 
 		if mid := c.Query("mid"); !midRegex.MatchString(mid) {
 			response.Status = fiber.StatusBadRequest
-		} else if err := c.BodyParser(&body); err != nil {
-			logger.Warn().Msg(`body can't be parsed as "struct{ name string }"`)
+			response.Message = "invalid element name"
 
+			logger.Info().Msgf("can't reserve element: invalid element-name: %q", mid)
+		} else if err := c.BodyParser(&body); err != nil {
 			response.Status = fiber.StatusBadRequest
+			response.Message = "invalid message-body"
+
+			logger.Warn().Msg(`body can't be parsed as "struct{ name string }"`)
 		} else {
 			// check wether the element already exists
 			if elements, found := dbCache.Get("elements"); found {
 				if _, ok := elements.(map[string]string)[mid]; ok {
 					response.Status = fiber.StatusBadRequest
+					response.Message = "element is already reserved"
+
+					logger.Info().Msgf("element %q is already reserved", mid)
 
 					return response
 				}
@@ -386,8 +433,13 @@ func postElements(c *fiber.Ctx) responseMessage {
 			// write the data to the database
 			if err := dbInsert("elements", ElementDB{Mid: mid, Name: body.Name}); err != nil {
 				response.Status = fiber.StatusInternalServerError
+				response.Message = "error while writing reservation to database"
+
+				logger.Error().Msgf("can't write reservation to database: %v", err)
 			} else {
 				response = getElements(c)
+
+				logger.Debug().Msgf("reserved element %q", mid)
 			}
 		}
 	}
@@ -395,27 +447,39 @@ func postElements(c *fiber.Ctx) responseMessage {
 	return response
 }
 
+// handles patch-requests for modifying element reservations
 func patchElements(c *fiber.Ctx) responseMessage {
 	response := responseMessage{}
 
 	if user, err := checkUser(c); err != nil {
 		response.Status = fiber.StatusInternalServerError
+
+		logger.Error().Msgf("can't check user: %v", err)
 	} else if !user {
 		response.Status = fiber.StatusUnauthorized
+
+		logger.Info().Msg("request is not authorized as user")
 	} else {
 		body := struct{ Name string }{}
 
 		if mid := c.Query("mid"); !midRegex.MatchString(mid) {
 			response.Status = fiber.StatusBadRequest
-		} else if err := c.BodyParser(&body); err != nil {
-			logger.Warn().Msg(`body can't be parsed as "struct{ name string }"`)
+			response.Message = "invalid element name"
 
+			logger.Info().Msgf("can't modify element: invalid element-name: %q", mid)
+		} else if err := c.BodyParser(&body); err != nil {
 			response.Status = fiber.StatusBadRequest
+			response.Message = "invalid message-body"
+
+			logger.Warn().Msg(`body can't be parsed as "struct{ name string }"`)
 		} else {
 			// check wether the element already exists
 			if elements, found := dbCache.Get("elements"); found {
 				if _, ok := elements.(map[string]string)[mid]; !ok {
 					response.Status = fiber.StatusBadRequest
+					response.Message = "element is already reserved"
+
+					logger.Info().Msgf("element %q is already reserved", mid)
 
 					return response
 				}
@@ -427,8 +491,13 @@ func patchElements(c *fiber.Ctx) responseMessage {
 			// write the data to the database
 			if err := dbUpdate("elements", struct{ Name string }{Name: body.Name}, struct{ Mid string }{Mid: mid}); err != nil {
 				response.Status = fiber.StatusInternalServerError
+				response.Message = "error while writing reservation to database"
+
+				logger.Error().Msgf("can't write reservation to database: %v", err)
 			} else {
 				response = getElements(c)
+
+				logger.Debug().Msgf("modified reservation for element %q", mid)
 			}
 		}
 	}
@@ -436,23 +505,36 @@ func patchElements(c *fiber.Ctx) responseMessage {
 	return response
 }
 
+// handle delete-requets for deleting an element reservation
 func deleteElements(c *fiber.Ctx) responseMessage {
 	response := responseMessage{}
 
 	if user, err := checkUser(c); err != nil {
 		response.Status = fiber.StatusInternalServerError
+
+		logger.Error().Msgf("can't check user: %v", err)
 	} else if !user {
 		response.Status = fiber.StatusUnauthorized
+
+		logger.Info().Msg("request is not authorized as user")
 	} else {
 		if mid := c.Query("mid"); !midRegex.MatchString(mid) {
 			response.Status = fiber.StatusBadRequest
+			response.Message = "invalid element name"
+
+			logger.Info().Msgf("can't delete element: invalid element-name: %q", mid)
 		} else {
 			dbCache.Delete("elements")
 
 			if err := dbDelete("elements", struct{ Mid string }{Mid: mid}); err != nil {
 				response.Status = fiber.StatusInternalServerError
+				response.Message = "error while deleting reservation from database"
+
+				logger.Error().Msgf("can't delete reservation from database: %v", err)
 			} else {
 				response = getElements(c)
+
+				logger.Debug().Msgf("deleted reservation for %q", mid)
 			}
 		}
 	}
@@ -460,11 +542,13 @@ func deleteElements(c *fiber.Ctx) responseMessage {
 	return response
 }
 
-type AddUser struct {
+// request for adding a user
+type AddUserBody struct {
 	Name     string
 	Password string
 }
 
+// user-entry in the database
 type UserDB struct {
 	Uid      int    `json:"uid"`
 	Name     string `json:"name"`
@@ -472,17 +556,23 @@ type UserDB struct {
 	Tid      int    `json:"tid"`
 }
 
+// hashes a password
 func hashPassword(password string) ([]byte, error) {
 	return bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 }
 
+// handles get-request for the users
 func getUsers(c *fiber.Ctx) responseMessage {
 	var response responseMessage
 
 	if isAdmin, err := checkAdmin(c); err != nil {
 		response.Status = fiber.StatusInternalServerError
+
+		logger.Error().Msgf("can't check for admin-user: %v", err)
 	} else if !isAdmin {
 		response.Status = fiber.StatusUnauthorized
+
+		logger.Info().Msg("request is not authorized as admin")
 	} else {
 		// retrieve all users
 		if users, err := dbSelect[struct {
@@ -490,58 +580,71 @@ func getUsers(c *fiber.Ctx) responseMessage {
 			Name string `json:"name"`
 		}]("users", ""); err != nil {
 			response.Status = fiber.StatusInternalServerError
+			response.Message = "can't get users from database"
 
 			logger.Error().Msgf("can't get users from database: %v", err)
 		} else {
 			response.Data = users
+
+			logger.Debug().Msg("retrieved users from database")
 		}
 	}
 
 	return response
 }
 
+// validates a password against the password-rules
 func validatePassword(password string) bool {
 	return len(password) >= 12 && len(password) <= 64
 }
 
+// handles post-request to add a new user to the database
 func postUsers(c *fiber.Ctx) responseMessage {
 	response := responseMessage{}
-	body := AddUser{}
+	body := AddUserBody{}
 
 	if admin, err := checkAdmin(c); err != nil {
 		response.Status = fiber.StatusInternalServerError
 
-		logger.Error().Msgf("error while checking for admin-user: %v", err)
+		logger.Error().Msgf("can't check for admin-user: %v", err)
 	} else if !admin {
 		response.Status = fiber.StatusUnauthorized
-	} else if err := c.BodyParser(&body); err != nil {
-		logger.Warn().Msg(`body can't be parsed as "struct{ name string; Password string }"`)
 
+		logger.Info().Msg("request is not authorized as user")
+	} else if err := c.BodyParser(&body); err != nil {
 		response.Status = fiber.StatusBadRequest
+		response.Message = "invalid message-body"
+
+		logger.Warn().Msg(`body can't be parsed as "struct{ name string; Password string }"`)
 	} else {
-		// check, wether the name already exists
 		if dbUsers, err := dbSelect[UserDB]("users", "name = ? LIMIT 1", body.Name); err != nil {
 			response.Status = fiber.StatusInternalServerError
+
+			logger.Error().Msgf("can't read users from database: %v", err)
 		} else if len(dbUsers) != 0 {
 			response.Status = fiber.StatusBadRequest
+			response.Message = "user already exists"
 
 			logger.Info().Msgf("can't add user: user with name %q already exists", body.Name)
 		} else {
 			// everything is valid
 			if hashedPassword, err := hashPassword(body.Password); err != nil {
-				logger.Error().Msgf("error during password-hashing: %v", err)
-
 				response.Status = fiber.StatusInternalServerError
+
+				logger.Error().Msgf("can't hash password: %v", err)
 			} else {
 				if err := dbInsert("users", struct {
 					Name     string
 					Password []byte
 				}{Name: body.Name, Password: hashedPassword}); err != nil {
-					logger.Error().Msgf("can't add user to database: %v", err)
-
 					response.Status = fiber.StatusInternalServerError
+					response.Message = "can't add user to database"
+
+					logger.Error().Msgf("can't add user to database: %v", err)
 				} else {
 					response = getUsers(c)
+
+					logger.Debug().Msgf("added user %q", body.Name)
 				}
 			}
 		}
@@ -550,13 +653,15 @@ func postUsers(c *fiber.Ctx) responseMessage {
 	return response
 }
 
+// handles patch-request to change a useres password
 func patchUsers(c *fiber.Ctx) responseMessage {
 	response := responseMessage{}
 
 	if admin, err := checkAdmin(c); err != nil {
 		response.Status = fiber.StatusInternalServerError
+		response.Message = "error while checking the authorization"
 
-		logger.Info().Msgf("error while check for admin: %v", err)
+		logger.Error().Msgf("can't check for admin: %v", err)
 	} else if !admin {
 		response.Status = fiber.StatusUnauthorized
 
@@ -568,21 +673,26 @@ func patchUsers(c *fiber.Ctx) responseMessage {
 
 		// check wether a valid uid is present
 		if uid := c.QueryInt("uid", -1); uid < 0 {
-			logger.Info().Msg("query doesn't include valid uid")
-
 			response.Status = fiber.StatusBadRequest
+			response.Message = "query doesn't include valid uid"
+
+			logger.Info().Msg("query doesn't include valid uid")
 		} else {
 			// try to parse the body
 			if err := c.BodyParser(&body); err != nil {
-				logger.Warn().Msg(`body can't be parsed as "struct{ password string }"`)
-
 				response.Status = fiber.StatusBadRequest
+				response.Message = "invalid message-body"
+
+				logger.Warn().Msg(`body can't be parsed as "struct{ password string }"`)
 			} else {
 				// check, wether the user exists
 				if dbUsers, err := dbSelect[UserDB]("users", "uid = ? LIMIT 1", uid); err != nil {
 					response.Status = fiber.StatusInternalServerError
+
+					logger.Error().Msgf("can't read users from database: %v", err)
 				} else if len(dbUsers) != 1 {
 					response.Status = fiber.StatusBadRequest
+					response.Message = "user doesn't exist"
 
 					logger.Info().Msgf("can't modify user: user with uid %q doesn't exist", uid)
 				} else {
@@ -590,21 +700,26 @@ func patchUsers(c *fiber.Ctx) responseMessage {
 
 					// hash the new password
 					if hashedPassword, err := hashPassword(body.Password); err != nil {
-						logger.Error().Msgf("error during password-hashing: %v", err)
-
 						response.Status = fiber.StatusInternalServerError
+
+						logger.Error().Msgf("can't hash password: %v", err)
 					} else {
 						// increase the token-id of the user to make the current-token invalid
 						if _, err := incTokenId(uid); err != nil {
 							response.Status = fiber.StatusInternalServerError
+
+							logger.Error().Msgf("can't increase the tid: %v", err)
 						} else {
 							// update the databse with the new password
 							if err := dbUpdate("users", struct{ Password []byte }{Password: hashedPassword}, struct{ Uid int }{Uid: uid}); err != nil {
-								logger.Error().Msgf("can't update password: %v", err)
-
 								response.Status = fiber.StatusInternalServerError
+								response.Message = "can't update password"
+
+								logger.Error().Msgf("can't update password: %v", err)
 							} else {
-								return getUsers(c)
+								logger.Debug().Msgf("updated password for user %q", uid)
+
+								response = getUsers(c)
 							}
 						}
 					}
@@ -616,28 +731,33 @@ func patchUsers(c *fiber.Ctx) responseMessage {
 	return response
 }
 
+// handle delete-request for removing a user
 func deleteUsers(c *fiber.Ctx) responseMessage {
 	response := responseMessage{}
 
 	if admin, err := checkAdmin(c); err != nil {
 		response.Status = fiber.StatusInternalServerError
 
-		logger.Error().Msgf("error while checking for admin-user: %v", err)
+		logger.Error().Msgf("can't check for admin-user: %v", err)
 	} else if !admin {
 		response.Status = fiber.StatusUnauthorized
 
 		// check wether there is a valid uid
 	} else if uid := c.QueryInt("uid", -1); uid < 0 {
-		logger.Info().Msg("query doesn't include valid uid")
-
 		response.Status = fiber.StatusBadRequest
+		response.Message = "query doesn't include valid uid"
+
+		logger.Info().Msg("query doesn't include valid uid")
 	} else {
 		// delete the user from the database
 		if err := dbDelete("users", struct{ Uid int }{Uid: uid}); err != nil {
 			response.Status = fiber.StatusInternalServerError
+			response.Message = "can't delete user"
 
 			logger.Error().Msgf("can't delete user with uid = %q: %v", uid, err)
 		} else {
+			logger.Debug().Msgf("deleted user with uid = %q", uid)
+
 			response = getUsers(c)
 		}
 	}
@@ -645,15 +765,18 @@ func deleteUsers(c *fiber.Ctx) responseMessage {
 	return response
 }
 
+// handles patch-requests to change the users password
 func patchUserPassword(c *fiber.Ctx) responseMessage {
 	response := responseMessage{}
 
 	if user, err := checkUser(c); err != nil {
 		response.Status = fiber.StatusInternalServerError
 
-		logger.Info().Msgf("error during user-check: %v", err)
+		logger.Error().Msgf("can't check for user: %v", err)
 	} else if !user {
 		response.Status = fiber.StatusUnauthorized
+
+		logger.Info().Msg("request is not authorized as user")
 	} else {
 		// parse the body
 		var body struct {
@@ -662,36 +785,41 @@ func patchUserPassword(c *fiber.Ctx) responseMessage {
 
 		if uid, _, err := extractJWT(c); err != nil {
 			response.Status = fiber.StatusBadRequest
+			response.Message = "query doesn't include valid uid"
 
-			logger.Info().Msg("can't extract uid from query")
+			logger.Warn().Msg("can't extract uid from query")
 		} else if err := c.BodyParser(&body); err != nil {
 			response.Status = fiber.StatusBadRequest
 
 			logger.Warn().Msg(`body can't be parsed as "struct{ password string }"`)
 		} else if !validatePassword(body.Password) {
 			response.Status = fiber.StatusBadRequest
+			response.Message = "invalid password"
 
-			response.Message = ptr("invalid password")
-
-			logger.Warn().Msg("invalid password")
+			logger.Info().Msg("invalid password")
 		} else {
 			// hash the new password
 			if hashedPassword, err := hashPassword(body.Password); err != nil {
-				logger.Error().Msgf("error during password-hashing: %v", err)
-
 				response.Status = fiber.StatusInternalServerError
+
+				logger.Error().Msgf("can't hash password: %v", err)
 			} else {
 				// increase the token-id of the user to make the current-token invalid
 				if _, err := incTokenId(uid); err != nil {
 					response.Status = fiber.StatusInternalServerError
+
+					logger.Error().Msgf("can't increase tid: %v", err)
 				} else {
 					// update the databse with the new password
 					if err := dbUpdate("users", struct{ Password []byte }{Password: hashedPassword}, struct{ Uid int }{Uid: uid}); err != nil {
-						logger.Error().Msgf("can't update password: %v", err)
-
 						response.Status = fiber.StatusInternalServerError
+						response.Message = "can't update password"
+
+						logger.Error().Msgf("can't update password: %v", err)
 					} else {
-						return getUsers(c)
+						logger.Debug().Msgf("updated password for user with uid = %q", uid)
+
+						response = getUsers(c)
 					}
 				}
 			}
@@ -701,7 +829,10 @@ func patchUserPassword(c *fiber.Ctx) responseMessage {
 	return response
 }
 
+// handle welcome-messages from clients
 func handleWelcome(c *fiber.Ctx) error {
+	logger.Debug().Msgf("HTTP %s request: %q", c.Method(), c.OriginalURL())
+
 	response := responseMessage{}
 	response.Data = UserLogin{
 		LoggedIn: false,
@@ -709,18 +840,24 @@ func handleWelcome(c *fiber.Ctx) error {
 
 	if ok, err := checkUser(c); err != nil {
 		response.Status = fiber.StatusInternalServerError
+
+		logger.Warn().Msgf("can't check user: %v", err)
 	} else if !ok {
 		response.Status = fiber.StatusUnauthorized
 	} else {
 		if uid, _, err := extractJWT(c); err != nil {
 			response.Status = fiber.StatusBadRequest
+
+			logger.Error().Msgf("can't extract JWT: %v", err)
 		} else {
 			if users, err := dbSelect[UserDB]("users", "uid = ? LIMIT 1", strconv.Itoa(uid)); err != nil {
 				response.Status = fiber.StatusInternalServerError
+
+				logger.Error().Msgf("can't get users from database: %v", err)
 			} else {
 				if len(users) != 1 {
 					response.Status = fiber.StatusForbidden
-					response.Message = ptr("unknown user")
+					response.Message = "unknown user"
 
 					removeSessionCookie(c)
 				} else {
@@ -732,6 +869,8 @@ func handleWelcome(c *fiber.Ctx) error {
 						LoggedIn: true,
 					}
 				}
+
+				logger.Debug().Msgf("welcomed user with uid = %v", uid)
 			}
 		}
 	}
@@ -739,17 +878,20 @@ func handleWelcome(c *fiber.Ctx) error {
 	return response.send(c)
 }
 
+// body from a login-request
 type LoginBody struct {
 	User     string `json:"user"`
 	Password string `json:"password"`
 }
 
+// data of the logged-in-status
 type UserLogin struct {
 	Uid      int    `json:"uid"`
 	Name     string `json:"name"`
 	LoggedIn bool   `json:"logged_in"`
 }
 
+// retrieves the current tid for a specific user from the database
 func getTokenId(uid int) (int, error) {
 	if response, err := dbSelect[UserDB]("users", "uid = ? LIMIT 1", uid); err != nil {
 		return -1, err
@@ -760,6 +902,7 @@ func getTokenId(uid int) (int, error) {
 	}
 }
 
+// increases the tid of a user
 func incTokenId(uid int) (int, error) {
 	if tid, err := getTokenId(uid); err != nil {
 		return -1, err
@@ -772,23 +915,34 @@ func incTokenId(uid int) (int, error) {
 	}
 }
 
+var messageWrongLogin = "Unkown user or wrong password"
+
+// handles login-requests
 func handleLogin(c *fiber.Ctx) error {
+	logger.Debug().Msgf("HTTP %s request: %q", c.Method(), c.OriginalURL())
+
 	var response responseMessage
 
 	body := LoginBody{}
 
 	if err := c.BodyParser(&body); err != nil {
-		logger.Warn().Msgf("error while parsing login-body: %v", err)
-
 		response.Status = fiber.StatusBadRequest
+		response.Message = "can't parse message-body"
+
+		logger.Warn().Msgf("can't parse login-body: %v", err)
 	} else {
 		// try to get the hashed password from the database
 		dbResult, err := dbSelect[UserDB]("users", "name = ? LIMIT 1", body.User)
 
 		if err != nil {
 			response.Status = fiber.StatusInternalServerError
+
+			logger.Error().Msgf("can't get users from the database: %v", err)
 		} else if len(dbResult) != 1 {
 			response.Status = fiber.StatusForbidden
+			response.Message = messageWrongLogin
+
+			logger.Info().Msgf("user with name = %q doesn't exist", body.User)
 		} else {
 			response.Data = UserLogin{
 				LoggedIn: false,
@@ -798,8 +952,9 @@ func handleLogin(c *fiber.Ctx) error {
 
 			if len(dbResult) != 1 || bcrypt.CompareHashAndPassword(user.Password, []byte(body.Password)) != nil {
 				response.Status = fiber.StatusUnauthorized
-				message := "Unkown user or wrong password"
-				response.Message = &message
+				response.Message = messageWrongLogin
+
+				logger.Debug().Msgf("can't login: wrong username or password")
 			} else {
 				// get the token-id
 				if tid, err := incTokenId(user.Uid); err != nil {
@@ -814,11 +969,10 @@ func handleLogin(c *fiber.Ctx) error {
 					})
 
 					if err != nil {
-						logger.Error().Msgf("json-webtoken creation failed: %v", err)
-
 						response.Status = fiber.StatusInternalServerError
-					} else {
 
+						logger.Error().Msgf("json-webtoken creation failed: %v", err)
+					} else {
 						c.Cookie(&fiber.Cookie{
 							Name:     "session",
 							Value:    jwt,
@@ -832,6 +986,8 @@ func handleLogin(c *fiber.Ctx) error {
 							Name:     user.Name,
 							LoggedIn: true,
 						}
+
+						logger.Info().Msgf("user with uid = %q logged in", user.Uid)
 					}
 				}
 			}
@@ -841,6 +997,7 @@ func handleLogin(c *fiber.Ctx) error {
 	return response.send(c)
 }
 
+// removes the session-coockie from a request
 func removeSessionCookie(c *fiber.Ctx) {
 	c.Cookie(&fiber.Cookie{
 		Name:     "session",
@@ -851,7 +1008,10 @@ func removeSessionCookie(c *fiber.Ctx) {
 	})
 }
 
+// handles logout-requests
 func handleLogout(c *fiber.Ctx) error {
+	logger.Debug().Msgf("HTTP %s request: %q", c.Method(), c.OriginalURL())
+
 	removeSessionCookie(c)
 
 	return responseMessage{
@@ -862,7 +1022,7 @@ func handleLogout(c *fiber.Ctx) error {
 }
 
 func main() {
-	// database
+	// setup the database-connection
 	sqlConfig := mysql.Config{
 		AllowNativePasswords: true,
 		Net:                  "tcp",
@@ -872,19 +1032,22 @@ func main() {
 		DBName:               config.Database.Database,
 	}
 
+	// connect to the database
 	db, _ = sql.Open("mysql", sqlConfig.FormatDSN())
 	db.SetMaxIdleConns(10)
 	db.SetMaxIdleConns(100)
 	db.SetConnMaxLifetime(time.Minute)
 
-	// cache
+	// setup the cache
 	dbCache = cache.New(config.Cache.Expiration, config.Cache.Purge)
 
+	// setup fiber
 	app := fiber.New(fiber.Config{
 		AppName:               "johannes-pv",
 		DisableStartupMessage: true,
 	})
 
+	// map with the individual methods
 	handleMethods := map[string]func(path string, handlers ...func(*fiber.Ctx) error) fiber.Router{
 		"GET":    app.Get,
 		"POST":   app.Post,
@@ -892,6 +1055,7 @@ func main() {
 		"DELETE": app.Delete,
 	}
 
+	// map with the individual registered endpoints
 	endpoints := map[string]map[string]func(*fiber.Ctx) responseMessage{
 		"GET": {
 			"elements": getElements,
@@ -917,6 +1081,7 @@ func main() {
 	app.Post("/pv/api/login", handleLogin)
 	app.Get("/pv/api/logout", handleLogout)
 
+	// register the registered endpoints
 	for method, handlers := range endpoints {
 		for address, handler := range handlers {
 			handleMethods[method]("/pv/api/"+address, func(c *fiber.Ctx) error {
@@ -927,5 +1092,6 @@ func main() {
 		}
 	}
 
+	// start the server
 	app.Listen(fmt.Sprintf(":%d", config.Server.Port))
 }
