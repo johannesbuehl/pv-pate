@@ -9,7 +9,6 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-var CONFIG_TEMPLATE = "../backend/example-config.yaml"
 var CONFIG_PATH = "../backend/config.yaml"
 
 type ConfigYaml struct {
@@ -43,7 +42,7 @@ var config ConfigYaml
 func loadConfig() ConfigYaml {
 	config := ConfigYaml{}
 
-	yamlFile, err := os.ReadFile(CONFIG_TEMPLATE)
+	yamlFile, err := os.ReadFile(CONFIG_PATH)
 	if err != nil {
 		panic(fmt.Sprintf("Error opening config-file: %q", err))
 	}
