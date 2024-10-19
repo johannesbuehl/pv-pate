@@ -42,7 +42,7 @@
 			id="header-content"
 			:class="{ visible: hamburger_menu }"
 		>
-			<a v-if="!is_home('/')" href="/">Home</a>
+			<a v-if="!is_home('/') && user?.logged_in" href="/">Home</a>
 			
 			<template
 				v-if="user?.logged_in"
