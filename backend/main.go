@@ -371,6 +371,15 @@ func postElements(c *fiber.Ctx) responseMessage {
 
 			response.Status = fiber.StatusBadRequest
 		} else {
+			// check wether the element already exists
+			if elements, found := dbCache.Get("elements"); found {
+				if _, ok := elements.(map[string]string)[mid]; ok {
+					response.Status = fiber.StatusBadRequest
+
+					return response
+				}
+			}
+
 			// clear the current cache
 			dbCache.Delete("elements")
 
@@ -403,6 +412,15 @@ func patchElements(c *fiber.Ctx) responseMessage {
 
 			response.Status = fiber.StatusBadRequest
 		} else {
+			// check wether the element already exists
+			if elements, found := dbCache.Get("elements"); found {
+				if _, ok := elements.(map[string]string)[mid]; !ok {
+					response.Status = fiber.StatusBadRequest
+
+					return response
+				}
+			}
+
 			// clear the current cache
 			dbCache.Delete("elements")
 
