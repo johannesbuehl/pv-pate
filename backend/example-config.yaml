@@ -1,0 +1,14 @@
+log_level: INFO
+database:
+  host: localhost:3306
+  user: user
+  password: password
+  database: database_name
+cache:
+  expiration: 12h
+  purge: 12h
+client_session:
+  jwt_signature: auto_generated_from_setup
+  expire: 168h
+server:
+  port: 61016

@@ -1,4 +1,4 @@
-.PHONY: all backend client
+.PHONY: all backend client setup
 
 all: backend client
 
@@ -9,3 +9,7 @@ backend:
 client:
 	@echo "building client"
 	cd client; npm install; npm run build
+
+setup:
+	@echo "running setup"
+	cd setup; go run .
