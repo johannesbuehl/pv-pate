@@ -47,7 +47,7 @@
 			<template
 				v-if="user?.logged_in"
 			>
-				<a v-if="!is_home('/admin.html')" href="/admin.html">Admin</a>
+				<a v-if="!is_home('/admin')" href="/admin">Admin</a>
 			
 				<slot name="header"></slot>
 			</template>
