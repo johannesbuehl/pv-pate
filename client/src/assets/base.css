@@ -15,7 +15,7 @@
 	--font-default: Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif;
 	--font-header: Oxygen, sans-serif;
 
-	--color-module: hsl(240 100 50);
+	--color-module: hsl(208, 75%, 41%);
 	--color-module-hover: hsl(from var(--color-module) h s calc(l - 0.2));
 	--color-module-selected: hsl(from var(--color-module) h s calc(l * 0.5));
 
@@ -23,7 +23,7 @@
 	--color-module-sold-hover: hsl(from var(--color-module-sold) h s calc(l - 0.1));
 	--color-module-sold-selected: hsl(from var(--color-module-sold) h s calc(l * 0.5));
 
-	--color-inverter: hsl(30 100 50);
+	--color-inverter: hsl(36, 100%, 48%);
 	--color-inverter-hover: hsl(from var(--color-inverter) h calc(s * 0.8) calc(l * 0.8));
 	--color-inverter-selected: hsl(from var(--color-inverter) h s calc(l * 0.5));
 
@@ -31,7 +31,7 @@
 	--color-inverter-sold-hover: hsl(from var(--color-inverter-sold) h calc(s * 0.8) calc(l * 0.8));
 	--color-inverter-sold-selected: hsl(from var(--color-inverter-sold) h s calc(l * 0.5));
 
-	--color-battery: hsl(120 50 50);
+	--color-battery: hsl(95, 59%, 43%);
 	--color-battery-hover: hsl(from var(--color-battery) h calc(s * 0.8) calc(l * 0.8));
 	--color-battery-selected: hsl(from var(--color-battery) h s calc(l * 0.5));
 
