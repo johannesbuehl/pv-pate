@@ -59,11 +59,7 @@
 			<a @click="logout"><FontAwesomeIcon :icon="faPowerOff" /></a>
 		</template>
 	</LayoutHeaderFooter>
-	<div id="scroll">
-		<div id="app_content">
-			<slot></slot>
-		</div>
-	</div>
+	<slot></slot>
 	<LayoutHeaderFooter id="footer">
 		<a
 			v-for="[name, url] in Object.entries(footer_sites)"
@@ -77,15 +73,6 @@
 </template>
 
 <style scoped>
-	#scroll {
-		flex: 1;
-
-		height: 100%;
-
-		display: flex;
-		justify-content: center;
-	}
-
 	#hamburger-toggle {
 		display: none;
 
