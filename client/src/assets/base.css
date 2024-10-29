@@ -12,10 +12,17 @@
 
 /* semantic color variables for this project */
 :root {
+	--v-color-blue: hsl(208, 75%, 41%);
+	--v-color-green: hsl(95, 59%, 43%);
+	--v-color-orange: hsl(36, 100%, 48%);
+	--v-color-white: white;
+	--v-color-black: black;
+
+
 	--font-default: Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif;
 	--font-header: Oxygen, sans-serif;
 
-	--color-module: hsl(208, 75%, 41%);
+	--color-module: var(--v-color-blue);
 	--color-module-hover: hsl(from var(--color-module) h s calc(l - 0.2));
 	--color-module-selected: hsl(from var(--color-module) h s calc(l * 0.5));
 
@@ -23,7 +30,7 @@
 	--color-module-sold-hover: hsl(from var(--color-module-sold) h s calc(l - 0.1));
 	--color-module-sold-selected: hsl(from var(--color-module-sold) h s calc(l * 0.5));
 
-	--color-inverter: hsl(36, 100%, 48%);
+	--color-inverter: var(--v-color-orange);
 	--color-inverter-hover: hsl(from var(--color-inverter) h calc(s * 0.8) calc(l * 0.8));
 	--color-inverter-selected: hsl(from var(--color-inverter) h s calc(l * 0.5));
 
@@ -31,11 +38,64 @@
 	--color-inverter-sold-hover: hsl(from var(--color-inverter-sold) h calc(s * 0.8) calc(l * 0.8));
 	--color-inverter-sold-selected: hsl(from var(--color-inverter-sold) h s calc(l * 0.5));
 
-	--color-battery: hsl(95, 59%, 43%);
+	--color-battery: var(--v-color-green);
 	--color-battery-hover: hsl(from var(--color-battery) h calc(s * 0.8) calc(l * 0.8));
 	--color-battery-selected: hsl(from var(--color-battery) h s calc(l * 0.5));
 
 	--color-battery-sold: hsl(from var(--color-battery) h calc(s * 0.25) calc(l * 1.5));
 	--color-battery-sold-hover: hsl(from var(--color-battery-sold) h calc(s * 0.8) calc(l * 0.8));
 	--color-battery-sold-selected: hsl(from var(--color-battery-sold) h s calc(l * 0.5));
+}
+
+* {
+	/* TODO replace with real font */
+	font-family: "Comic Sans MS";
+}
+
+.blue {
+	color: var(--v-color-blue);
+}
+
+.green {
+	color: var(--v-color-green);
+}
+
+.orange {
+	color: var(--v-color-orange);
+}
+
+.white {
+	color: var(--v-color-white);
+}
+
+.black {
+	color: var(--v-color-black);
+}
+
+.bold {
+	font-weight: bold;
+}
+
+.upper {
+	text-transform: uppercase;
+}
+
+.bg-orange {
+	background-color: var(--v-color-orange);
+}
+
+.left {
+	text-align: left;
+}
+
+.right {
+	text-align: right;
+}
+
+.center {
+	text-align: center;
+}
+
+.nowrap {
+	text-wrap: nowrap;
 }
