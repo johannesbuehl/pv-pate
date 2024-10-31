@@ -30,14 +30,8 @@ import AppLayout from './components/AppLayout/AppLayout.vue';
 			</p>
 			<p>
 				<span class="blue bold">Klimaschutz ist Bewahrung der Schöpfung</span><br>
-				Deshalb installieren wir
+				Und davon hat auch die Kirche ihren Beitrag zu leisten. Schon in der frühen Planungsphase wurde das Augenmerk auf die regenerative Energie gerichtet. Alle Neubauten bekommen eine Fußbodenheizung, die Kirche ein neues Heizregister und die energetisch sanierten Bestandsgebäude die Möglichkeit die Vorlaufstemperatur zu reduzieren. Damit ist es möglich über 80 kW Wärmepumpen, 3.000 l Wasserspeicher und eine 99 kWp PV Anlage die Versorgung nachhaltig zu betreiben. Im Jahresmittel produzieren wir mehr regenerative Energie als verbraucht wird und leisten damit einen klimapositiven Beitrag.
 			</p>
-			<ul>
-				<li>99,27 kWp PV-Anlage</li>
-				<li>22 kWh Batteriespeicher</li>
-				<li>80 kW Wärmepumpen</li>
-				<li>3.000l Wasserspeicher</li>
-			</ul>
 			<div id="psalm-verse">
 				<div id="psalm" class="blue bold">
 					<div class="left">
