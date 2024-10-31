@@ -29,16 +29,16 @@ import AppLayout from './components/AppLayout/AppLayout.vue';
 				Ein <span class="blue upper bold">Klimaplus</span>-<span class="green upper bold">Gemeindezentrum</span> der Evangelischen Kirchengemeinde in Bühl
 			</p>
 			<p>
-				<div class="blue bold">Klimaschutz ist Bewahrung der Schöpfung</div>
+				<span class="blue bold">Klimaschutz ist Bewahrung der Schöpfung</span><br>
 				Deshalb installieren wir
-				<ul>
-					<li>99,27 kWp PV-Anlage</li>
-					<li>22 kWh Batteriespeicher</li>
-					<li>80 kW Wärmepumpen</li>
-					<li>3.000l Wasserspeicher</li>
-				</ul>
 			</p>
-			<p id="psalm-verse">
+			<ul>
+				<li>99,27 kWp PV-Anlage</li>
+				<li>22 kWh Batteriespeicher</li>
+				<li>80 kW Wärmepumpen</li>
+				<li>3.000l Wasserspeicher</li>
+			</ul>
+			<div id="psalm-verse">
 				<div id="psalm" class="blue bold">
 					<div class="left">
 						„Vom Aufgang der Sonne
@@ -53,7 +53,7 @@ import AppLayout from './components/AppLayout/AppLayout.vue';
 				<div id="citation" class="black right">
 					Psalm 113,3
 				</div>
-			</p>
+			</div>
 			<p>
 				So lautet ein bekannter Kanon (Psalm 113,3).
 			</p>
@@ -64,42 +64,40 @@ import AppLayout from './components/AppLayout/AppLayout.vue';
 				Wer finanziert und spendet uns ein Solarpanel (oder mehrere)? Wer hilft uns dabei, sauber und sicher Energie zu gewinnen – für unsere Kirchengemeinde und für andere, indem wir unsere Überschüsse verkaufen, um Erträge für die Finanzierung des Gemeindezentrums zu generieren bzw. für den Stromkauf im Winter. Wer trägt dazu bei, unser Gemeindezentrum gut für die Zukunft aufzustellen und – auch im übertragenen Sinn – mehr Licht und Wärme in unsere Stadt zu bringen?
 			</p>
 			<p class="green bold">
-				<p>
-					<span class="upper">
-						Und so werden Sie <span class="blue">Klimaplus</span>-Pate und -Patin
-					</span>
-					für ein CO<sub>2</sub>-freies Gemeindezentrum
-				</p>
-				<table id="element-list">
-					<tbody>
-						<tr>
-							<td>1</td>
-							<td>122 St. PV-Indach-Module auf dem Kirchendach</td>
-							<td class="bold blue right nowrap">1.250 €</td>
-						</tr>
-						<tr>
-							<td>2</td>
-							<td>53 St. PV-Aufdach-Module auf dem Ostdach vom Kindergarten</td>
-							<td class="bold blue right nowrap">550 €</td>
-						</tr>
-						<tr>
-							<td>3</td>
-							<td>42 St. PV-Aufdach-Module auf dem Westdach vom Gemeindehaus</td>
-							<td class="bold blue right nowrap">550 €</td>
-						</tr>
-						<tr>
-							<td>4</td>
-							<td>28 St. PV-Aufdach-Module auf dem Süddach vom Pfarrhaus</td>
-							<td class="bold blue right nowrap">550 €</td>
-						</tr>
-						<tr>
-							<td>5</td>
-							<td>2 St. Batteriespeicher mit je 11 kWh</td>
-							<td class="bold blue right nowrap">12.000 €</td>
-						</tr>
-					</tbody>
-					</table>
+				<span class="upper">
+					Und so werden Sie <span class="blue">Klimaplus</span>-Pate und -Patin
+				</span>
+				für ein CO<sub>2</sub>-freies Gemeindezentrum
 			</p>
+			<table id="element-list">
+				<tbody>
+					<tr>
+						<td>1</td>
+						<td>122 St. PV-Indach-Module auf dem Kirchendach</td>
+						<td class="bold blue right nowrap">1.250 €</td>
+					</tr>
+					<tr>
+						<td>2</td>
+						<td>53 St. PV-Aufdach-Module auf dem Ostdach vom Kindergarten</td>
+						<td class="bold blue right nowrap">550 €</td>
+					</tr>
+					<tr>
+						<td>3</td>
+						<td>42 St. PV-Aufdach-Module auf dem Westdach vom Gemeindehaus</td>
+						<td class="bold blue right nowrap">550 €</td>
+					</tr>
+					<tr>
+						<td>4</td>
+						<td>28 St. PV-Aufdach-Module auf dem Süddach vom Pfarrhaus</td>
+						<td class="bold blue right nowrap">550 €</td>
+					</tr>
+					<tr>
+						<td>5</td>
+						<td>2 St. Batteriespeicher mit je 11 kWh</td>
+						<td class="bold blue right nowrap">12.000 €</td>
+					</tr>
+				</tbody>
+			</table>
 		</div>
 		<BasePV
 			v-model:selected_element="selected_element"
