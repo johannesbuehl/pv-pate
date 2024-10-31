@@ -832,7 +832,7 @@ func handleWelcome(c *fiber.Ctx) error {
 
 		logger.Warn().Msgf("can't check user: %v", err)
 	} else if !ok {
-		response.Status = fiber.StatusUnauthorized
+		response.Status = fiber.StatusNoContent
 	} else {
 		if uid, _, err := extractJWT(c); err != nil {
 			response.Status = fiber.StatusBadRequest
@@ -1080,5 +1080,5 @@ func main() {
 	}
 
 	// start the server
-	app.Listen(fmt.Sprintf(":%d", config.Server.Port))
+	app.Listen(fmt.Sprintf("localhost:%d", config.Server.Port))
 }

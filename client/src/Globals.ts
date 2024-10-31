@@ -1,5 +1,5 @@
 import { ref } from "vue";
-import { api_call } from "./lib";
+import { api_call, HTTPStatus } from "./lib";
 
 export type ReservedElements = Record<string, string>;
 
@@ -27,7 +27,7 @@ export const user = ref<UserLogin>();
 void (async () => {
 	const response = await api_call<UserLogin>("GET", "welcome");
 
-	if (response.ok) {
+	if (response.status === HTTPStatus.OK) {
 		user.value = await response.json();
 	}
 })()
