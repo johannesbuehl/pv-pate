@@ -56,9 +56,7 @@
 	});
 
 	function hide_tooltip() {
-		if (svg_selected_element.value) {
-			svg_selected_element.value.classList.remove("selected");
-		}
+		svg_selected_element.value?.classList.remove("selected");
 
 		svg_selected_element.value = undefined;
 		selected_element.value = undefined;
@@ -116,6 +114,9 @@
 		const target = (e.target as SVGElement).closest(".element");
 
 		if (target) {
+			// clear the previous selected element
+			svg_selected_element.value?.classList.remove("selected");
+
 			svg_selected_element.value = target as SVGRectElement;
 			const mid = svg_selected_element.value?.id;
 
@@ -179,7 +180,7 @@
 	}
 
 	#tooltip-wrapper {
-		position: absolute;
+		position: fixed;
 
 		inset: 0;
 
@@ -220,7 +221,7 @@
 		user-select: none;
 	}
 
-	svg#main-content .element {
+	svg#main-content .fill {
 		cursor: pointer;
 		
 		transition: fill 0.2s;
