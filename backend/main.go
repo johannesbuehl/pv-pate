@@ -1080,5 +1080,5 @@ func main() {
 	}
 
 	// start the server
-	app.Listen(fmt.Sprintf("localhost:%d", config.Server.Port))
+	app.Listen(fmt.Sprintf(":%d", config.Server.Port))
 }
