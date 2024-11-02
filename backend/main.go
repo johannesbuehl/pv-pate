@@ -940,11 +940,7 @@ func handleLogin(c *fiber.Ctx) error {
 				logger.Debug().Msgf("can't login: wrong username or password")
 			} else {
 				// get the token-id
-				if err := incTokenId(user.Uid); err != nil {
-					response.Status = fiber.StatusInternalServerError
-
-					logger.Error().Msgf("can't increase tid for user with uid = %q", user.Uid)
-				} else if tid, err := getTokenId(user.Uid); err != nil {
+				if tid, err := getTokenId(user.Uid); err != nil {
 					response.Status = fiber.StatusInternalServerError
 
 					logger.Error().Msgf("can't get tid for user with uid = %q", user.Uid)
