@@ -387,7 +387,126 @@ func getElements(c *fiber.Ctx) responseMessage {
 }
 
 // regex to match valid element-names
-var midRegex = regexp.MustCompile(`^(?:pv-\w|(?:wr|bs)-)\d{1,2}$`)
+var midRegex = regexp.MustCompile(`^(pv-\w|(?:wr|bs)-)(\d{1,2})$`)
+
+var validElements = map[string]struct {
+	from int
+	to   int
+}{
+	"bs-": {
+		from: 1,
+		to:   2,
+	},
+	"pv-a": {
+		from: 1,
+		to:   16,
+	},
+	"pv-b": {
+		from: 2,
+		to:   37,
+	},
+	"pv-c": {
+		from: 3,
+		to:   37,
+	},
+	"pv-d": {
+		from: 3,
+		to:   37,
+	},
+	"pv-e": {
+		from: 1,
+		to:   6,
+	},
+	"pv-f": {
+		from: 1,
+		to:   6,
+	},
+	"pv-g": {
+		from: 1,
+		to:   6,
+	},
+	"pv-h": {
+		from: 1,
+		to:   7,
+	},
+	"pv-i": {
+		from: 1,
+		to:   7,
+	},
+	"pv-j": {
+		from: 1,
+		to:   7,
+	},
+	"pv-k": {
+		from: 1,
+		to:   7,
+	},
+	"pv-l": {
+		from: 1,
+		to:   7,
+	},
+	"pv-m": {
+		from: 1,
+		to:   7,
+	},
+	"pv-n": {
+		from: 1,
+		to:   7,
+	},
+	"pv-o": {
+		from: 1,
+		to:   7,
+	},
+	"pv-p": {
+		from: 1,
+		to:   7,
+	},
+	"pv-q": {
+		from: 1,
+		to:   7,
+	},
+	"pv-r": {
+		from: 1,
+		to:   7,
+	},
+	"pv-s": {
+		from: 1,
+		to:   7,
+	},
+	"pv-t": {
+		from: 1,
+		to:   7,
+	},
+	"pv-u": {
+		from: 1,
+		to:   7,
+	},
+	"pv-v": {
+		from: 1,
+		to:   7,
+	},
+	"wr-": {
+		from: 1,
+		to:   4,
+	},
+}
+
+func isValidMid(element string) (bool, error) {
+	if results := midRegex.FindStringSubmatch(element); results == nil {
+		return false, nil
+	} else {
+		// check wether the descriptor-part is valid
+		if rng, ok := validElements[results[1]]; !ok {
+			return false, nil
+
+			// try to parse the mid-number
+		} else if n, err := strconv.Atoi(results[2]); err != nil {
+			return false, err
+		} else {
+			return rng.from <= n && n <= rng.to, nil
+		}
+	}
+}
 
 // handles post-requests for reserving new elements
 func postElements(c *fiber.Ctx) responseMessage {
@@ -404,7 +523,9 @@ func postElements(c *fiber.Ctx) responseMessage {
 	} else {
 		body := struct{ Name string }{}
 
-		if mid := c.Query("mid"); !midRegex.MatchString(mid) {
+		mid := c.Query("mid")
+
+		if ok, err := isValidMid(mid); err != nil || !ok {
 			response.Status = fiber.StatusBadRequest
 			response.Message = "invalid element name"
 
@@ -462,7 +583,8 @@ func patchElements(c *fiber.Ctx) responseMessage {
 	} else {
 		body := struct{ Name string }{}
 
-		if mid := c.Query("mid"); !midRegex.MatchString(mid) {
+		mid := c.Query("mid")
+		if ok, err := isValidMid(mid); err != nil || !ok {
 			response.Status = fiber.StatusBadRequest
 			response.Message = "invalid element name"
 
@@ -518,7 +640,9 @@ func deleteElements(c *fiber.Ctx) responseMessage {
 
 		logger.Info().Msg("request is not authorized as user")
 	} else {
-		if mid := c.Query("mid"); !midRegex.MatchString(mid) {
+		mid := c.Query("mid")
+
+		if ok, err := isValidMid(mid); !ok || err != nil {
 			response.Status = fiber.StatusBadRequest
 			response.Message = "invalid element name"
 
