@@ -44,7 +44,7 @@ func loadConfig() ConfigYaml {
 
 	yamlFile, err := os.ReadFile(CONFIG_PATH)
 	if err != nil {
-		panic(fmt.Sprintf("Error opening config-file: %q", err))
+		panic(fmt.Sprintf("Error opening config-file: %v", err))
 	}
 
 	reader := bytes.NewReader(yamlFile)
@@ -53,7 +53,7 @@ func loadConfig() ConfigYaml {
 	dec.KnownFields(true)
 	err = dec.Decode(&config)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error parsing config-file: %q", err.Error())
+		fmt.Fprintf(os.Stderr, "Error parsing config-file: %v", err)
 		os.Exit(1)
 	}
 
