@@ -136,7 +136,7 @@ import AppLayout from './components/AppLayout/AppLayout.vue';
 	}
 
 	#text-content {
-		width: 40em;
+		max-width: 40em;
 
 		display: flex;
 		flex-direction: column;
@@ -156,6 +156,7 @@ import AppLayout from './components/AppLayout/AppLayout.vue';
 	#psalm-verse {
 		margin-inline: auto;
 		width: 21em;
+		max-width: 90cqw;
 	}
 
 	#citation {

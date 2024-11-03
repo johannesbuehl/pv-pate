@@ -13,7 +13,7 @@ input, button {
 body {
 	font-family: var(--font-default);
 	
-	margin: 0;
+	margin: 0.5em;
 
 	font-size: 1.5em;
 

@@ -129,8 +129,6 @@
 
 <style>
 	#app {
-		padding: 0.25em;
-
 		display: flex;
 		flex-direction: column;
 		align-items: center;

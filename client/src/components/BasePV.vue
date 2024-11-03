@@ -164,15 +164,13 @@
 
 <style scoped>
 	#wrapper {
-		position: relative;
-
-		height: 100%;
-
 		display: flex;
 
 		flex-direction: column;
 		justify-content: center;
 		overflow-x: auto;
+
+		max-width: 100%;
 	}
 
 	#div-svg {
@@ -207,8 +205,6 @@
 <style>
 	svg#main-content {
 		width: 50em;
-		/* max-width: 90cqw; */
-		max-width: 100cqh;
 	}
 
 	/* @media screen and (max-width: 900px) {
