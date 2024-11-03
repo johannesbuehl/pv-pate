@@ -2,10 +2,36 @@
 	import { ref } from 'vue';
 
 	import BasePV, { get_element_roof, get_element_type, type Element } from './components/BasePV.vue';
-	import { reserved_elements } from './Globals';
-import AppLayout from './components/AppLayout/AppLayout.vue';
+	import { reserved_elements, type ReservedElements } from './Globals';
+	import AppLayout from './components/AppLayout/AppLayout.vue';
+	import BaseButton from './components/BaseButton.vue';
+	import { faCheck } from '@fortawesome/free-solid-svg-icons';
+	import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { api_call, type APICallResult } from './lib';
 
-	const selected_element = ref<Element>();
+	const selected_element = ref<Element & { email: string }>();
+
+	async function submit() {
+		// check wether a element is selected
+		if (selected_element.value !== undefined) {
+			let response: APICallResult<ReservedElements>;
+			
+			// if the element is already reserved, patch it instead
+			const method = reserved_elements.value[selected_element.value.mid] === undefined ? "POST" : "PATCH";
+				
+			response = await api_call<{ reserved_elements: ReservedElements }>(method, "elements", { mid: selected_element.value.mid }, {
+				name: selected_element.value.name
+			});
+			
+			if (response.ok) {
+				reserved_elements.value = (await response.json()).reserved_elements;
+				
+				selected_element.value = undefined;
+			} else {
+				alert(`Error during database write: ${await response.text()}`);
+			}
+		}
+	}
 </script>
 
 <template>
@@ -112,14 +138,21 @@ import AppLayout from './components/AppLayout/AppLayout.vue';
 						Pate für dieses Element ist {{ selected_element.name }}
 					</template>
 					<template v-else>
-						Dieses Eleemnt hat bereits einen Paten
+						Dieses Element hat bereits einen Paten
 					</template>
 				</div>
 				<div
 					v-else
 					id="tooltip-buy"
 				>
-					Pate für dieses {{ get_element_type(selected_element.mid, true) }} werden.<br>
+					Pate für {{ get_element_type(selected_element.mid, true) }} werden.<br>
+					<div id="reserve-input-box">
+						<input type="email" id="input-email" v-model="selected_element.email" placeholder="E-Mail" />
+						<input type="text" id="input-name" v-model="selected_element.name" placeholder="Name (optional)" />
+						<BaseButton @click="submit">
+							<FontAwesomeIcon :icon="faCheck" /> Reservieren
+						</BaseButton>
+					</div>
 					Für unser Bauprojekt spenden: 
 					<a href="https://www.evkirchebuehl.de" target="_blank" rel="noopener noreferrer">Dummy-Link</a>
 				</div>
@@ -192,6 +225,19 @@ import AppLayout from './components/AppLayout/AppLayout.vue';
 
 	#element-list td {
 		margin: 0.5em
+	}
+
+	#reserve-input-box > input {
+		flex: 1;
+	}
+	
+	#input-email:invalid {
+		color: red;
+	}
+
+	#reserve-input-box {
+		display: flex;
+		flex-direction: column;
 	}
 
 	a {

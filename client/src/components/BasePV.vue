@@ -131,7 +131,7 @@
 
 			selected_element.value = {
 				mid,
-				name: reserved_element_text !== "" ? reserved_element_text : "Anonym"
+				name: reserved_element_text
 			};
 			
 			svg_selected_element.value.classList.add("selected");

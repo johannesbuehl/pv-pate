@@ -61,5 +61,7 @@ import { faXmark } from '@fortawesome/free-solid-svg-icons';
 		align-items: center;
 
 		padding: 0.25em;
+
+		margin-left: auto;
 	}
 </style>

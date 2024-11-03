@@ -7,3 +7,12 @@ Source-code for the fundraising-website of our photovoltaic-system
 - Anonym element: don't write name to database
 - implement module reservation (check on regular intervals wether reservation expired)
 - implement proper donation link
+- move to login-screen after password reset
+
+# reservations
+- e-mail bounce: delete reservation
+- add confirm
+
+## admin-panel
+- list of reserved modules: confirm or deny
+- change name of reservation

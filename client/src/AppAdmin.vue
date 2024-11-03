@@ -33,7 +33,7 @@
 		if (selected_element.value !== undefined) {
 			let response: APICallResult<ReservedElements>;
 			
-			const name = selected_element.value.name !== "" ? selected_element.value.name : "Anonym";
+			const name = selected_element.value.name !== "" ? selected_element.value.name : undefined;
 				
 			// if the element is already reserved, patch it instead
 			const method = reserved_elements.value[selected_element.value.mid] === undefined ? "POST" : "PATCH";
