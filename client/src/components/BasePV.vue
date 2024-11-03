@@ -3,12 +3,19 @@
 
 	const element_type_map: Record<string, string> = {
 			pv: "PV-Modul",
-			wr: "Wechselrichter",
-			bs: "Batterie"
-	}
+			bs: "Batteriespeicher"
+	};
+	const dieses_element_type_map: Record<string, string> = {
+		pv: "dieses PV-Modul",
+		bs: "diesen Batteriespeicher"
+	};
 
-	export function get_element_type(mid: string): string {
-		return element_type_map[mid.slice(0, 2)]
+	export function get_element_type(mid: string, dieses: boolean = false): string {
+		if (dieses) {
+			return dieses_element_type_map[mid.slice(0, 2)];
+		} else {
+			return element_type_map[mid.slice(0, 2)];
+		}
 	}
 
 	const row_roof_map = {

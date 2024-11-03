@@ -108,13 +108,19 @@ import AppLayout from './components/AppLayout/AppLayout.vue';
 					v-if="reserved_elements[selected_element.mid] !== undefined"
 					id="tooltip-sold"
 				>
-					Gespendet von {{ selected_element.name }}
+					<template v-if="!!selected_element.name">
+						Pate für dieses Element ist {{ selected_element.name }}
+					</template>
+					<template v-else>
+						Dieses Eleemnt hat bereits einen Paten
+					</template>
 				</div>
 				<div
 					v-else
 					id="tooltip-buy"
 				>
-					Dieses {{ get_element_type(selected_element.mid) }} spenden<br>
+					Pate für dieses {{ get_element_type(selected_element.mid, true) }} werden.<br>
+					Für unser Bauprojekt spenden: 
 					<a href="https://www.evkirchebuehl.de" target="_blank" rel="noopener noreferrer">Dummy-Link</a>
 				</div>
 			</template>
