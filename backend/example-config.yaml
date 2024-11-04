@@ -14,3 +14,12 @@ server:
   port: 61016
 reservation:
   expiration: 168h
+mail:
+  server: smtp.example.org
+  port: 587
+  user: user@example.org
+  password: PASSWORD
+  template:
+    subject: {{.ElementType}} {{.Element}}
+    body_plain: plain-text-body
+    body: html-body

@@ -7,11 +7,29 @@
 	import BaseButton from './components/BaseButton.vue';
 	import { faCheck } from '@fortawesome/free-solid-svg-icons';
 	import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { api_call, type APICallResult } from './lib';
+	import { api_call, type APICallResult } from './lib';
 
 	const selected_element = ref<Element & { email: string }>();
 
-	async function submit() {
+	let enter_press: boolean = false;
+	async function submit(e: Event) {
+		e.preventDefault();
+
+		// if the form was submitted through the enter-key, let the user confirm
+		if (enter_press) {
+			let confirm_string = `Reservierung bestätigen?\nE-Mail: ${selected_element.value?.email}\n`;
+
+			if (selected_element.value?.name != undefined && selected_element.value?.name?.length > 1) {
+				confirm_string += `Name: ${selected_element.value?.name}`;
+			} else {
+				confirm_string += `Ohne Namen`;
+			}
+
+			if (!confirm(confirm_string)) {
+				return;
+			}
+		}
+
 		// check wether a element is selected
 		if (selected_element.value !== undefined) {
 			let response: APICallResult<ReservedElements>;
@@ -20,7 +38,8 @@ import { api_call, type APICallResult } from './lib';
 			const method = reserved_elements.value[selected_element.value.mid] === undefined ? "POST" : "PATCH";
 				
 			response = await api_call<{ reserved_elements: ReservedElements }>(method, "elements", { mid: selected_element.value.mid }, {
-				name: selected_element.value.name
+				name: selected_element.value.name,
+				mail: selected_element.value.email
 			});
 			
 			if (response.ok) {
@@ -146,13 +165,20 @@ import { api_call, type APICallResult } from './lib';
 					id="tooltip-buy"
 				>
 					Pate für {{ get_element_type(selected_element.mid, true) }} werden.<br>
-					<div id="reserve-input-box">
-						<input type="email" id="input-email" v-model="selected_element.email" placeholder="E-Mail" />
-						<input type="text" id="input-name" v-model="selected_element.name" placeholder="Name (optional)" />
-						<BaseButton @click="submit">
-							<FontAwesomeIcon :icon="faCheck" /> Reservieren
-						</BaseButton>
-					</div>
+					<form
+						id="reserve-input-box"
+						@submit="submit"
+						@keydown.enter="enter_press = true"
+					>
+						<input type="email" name="mail" id="input-email" v-model="selected_element.email" placeholder="E-Mail" required />
+						<input type="text" name="name" id="input-name" v-model="selected_element.name" placeholder="Name (optional)" />
+						<input type="submit" style="display: none;" id="submit-reservation" />
+						<label for="submit-reservation">
+								<BaseButton>
+								<FontAwesomeIcon :icon="faCheck" /> Reservieren
+							</BaseButton>
+							</label>
+					</form>
 					Für unser Bauprojekt spenden: 
 					<a href="https://www.evkirchebuehl.de" target="_blank" rel="noopener noreferrer">Dummy-Link</a>
 				</div>

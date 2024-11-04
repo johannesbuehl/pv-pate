@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"strings"
+	"text/template"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -36,6 +37,17 @@ type ConfigYaml struct {
 	Reservation struct {
 		Expiration string `yaml:"expiration"`
 	} `yaml:"reservation"`
+	Mail struct {
+		Server   string `yaml:"server"`
+		Port     int    `yaml:"port"`
+		User     string `yaml:"user"`
+		Password string `yaml:"password"`
+		Template struct {
+			Subject   string `json:"body"`
+			Body      string `yaml:"body"`
+			BodyPlain string `yaml:"body_lain"`
+		} `json:"template"`
+	} `yaml:"mail"`
 }
 
 type CacheConfig struct {
@@ -53,6 +65,13 @@ type ConfigStruct struct {
 	SessionExpire time.Duration
 	Cache         CacheConfig
 	Reservation   ReservationConfig
+	Templates     ConfigTemplates
+}
+
+type ConfigTemplates struct {
+	Subject   *template.Template
+	Body      *template.Template
+	BodyPlain *template.Template
 }
 
 var config ConfigStruct
@@ -120,18 +139,34 @@ func loadConfig() ConfigStruct {
 	} else {
 		var configStruct ConfigStruct
 
+		// parse the durations
 		if session_expire, err := time.ParseDuration(config.ClientSession.Expire); err != nil {
-			fmt.Fprintf(os.Stderr, `Error Parsing "client_session.expire": %v`, err)
+			fmt.Fprintf(os.Stderr, `Error parsing "client_session.expire": %v`, err)
 			os.Exit(1)
 		} else if cacheExpire, err := time.ParseDuration(config.Cache.Expiration); err != nil {
-			fmt.Fprintf(os.Stderr, `Error Parsing "cache.expiration": %v`, err)
+			fmt.Fprintf(os.Stderr, `Error parsing "cache.expiration": %v`, err)
 			os.Exit(1)
 		} else if cachePurge, err := time.ParseDuration(config.Cache.Purge); err != nil {
-			fmt.Fprintf(os.Stderr, `Error Parsing "cache.purge": %v`, err)
+			fmt.Fprintf(os.Stderr, `Error parsing "cache.purge": %v`, err)
 			os.Exit(1)
 
 		} else if reservationExpire, err := time.ParseDuration(config.Reservation.Expiration); err != nil {
-			fmt.Fprintf(os.Stderr, `Error Parsing "reservation.expiration": %v`, err)
+			fmt.Fprintf(os.Stderr, `Error parsing "reservation.expiration": %v`, err)
+			os.Exit(1)
+
+			// parse the templates
+		} else if mailSubjectTemplate, err := template.New("mailSubject").Parse(config.Mail.Template.Subject); err != nil {
+			fmt.Fprintf(os.Stderr, `Error parsing "mail.template.subject": %v`, err)
+
+			os.Exit(1)
+		} else if mailBodyTemplate, err := template.New("mailBody").Parse(config.Mail.Template.Body); err != nil {
+			fmt.Fprintf(os.Stderr, `Error parsing "mail.template.body": %v`, err)
+
+			os.Exit(1)
+		} else if mailBodyPlainTemplate, err := template.New("mailBodyPlain").Parse(config.Mail.Template.BodyPlain); err != nil {
+			fmt.Fprintf(os.Stderr, `Error parsing "mail.template.body_plain": %v`, err)
+
+			os.Exit(1)
 		} else {
 			configStruct = ConfigStruct{
 				ConfigYaml:    config,
@@ -143,6 +178,11 @@ func loadConfig() ConfigStruct {
 				},
 				Reservation: ReservationConfig{
 					Expiration: reservationExpire,
+				},
+				Templates: ConfigTemplates{
+					Subject:   mailSubjectTemplate,
+					Body:      mailBodyTemplate,
+					BodyPlain: mailBodyPlainTemplate,
 				},
 			}
 		}

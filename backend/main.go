@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"database/sql"
 	"fmt"
 	"reflect"
@@ -13,6 +14,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/patrickmn/go-cache"
+	mail "github.com/xhit/go-simple-mail/v2"
 	"golang.org/x/crypto/bcrypt"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
@@ -517,7 +519,10 @@ func isValidMid(element string) (bool, error) {
 func postElements(c *fiber.Ctx) responseMessage {
 	response := responseMessage{}
 
-	body := struct{ Name string }{}
+	body := struct {
+		Name string
+		Mail string
+	}{}
 
 	mid := c.Query("mid")
 
@@ -560,19 +565,30 @@ func postElements(c *fiber.Ctx) responseMessage {
 				return response
 			}
 
-			// clear the current cache
-			dbCache.Delete("elements")
+			// send the reservation e-mail
+			data := ReservationData{
+				Mail:        body.Mail,
+				ElementType: getElementType(mid),
+				Element:     getElementID(mid),
+			}
 
-			// write the data to the database
-			if err := dbInsert("elements", ElementDBNoReservation{Mid: mid, Name: body.Name}); err != nil {
-				response.Status = fiber.StatusInternalServerError
-				response.Message = "error while writing reservation to database"
-
-				logger.Error().Msgf("can't write reservation to database: %v", err)
+			if err := data.sendReservationEmail(); err != nil {
+				logger.Error().Msgf("can't send reservation-mail")
 			} else {
-				response = getElements(c)
+				// clear the current cache
+				dbCache.Delete("elements")
 
-				logger.Debug().Msgf("reserved element %q", mid)
+				// write the data to the database
+				if err := dbInsert("elements", ElementDBNoReservation{Mid: mid, Name: body.Name}); err != nil {
+					response.Status = fiber.StatusInternalServerError
+					response.Message = "error while writing reservation to database"
+
+					logger.Error().Msgf("can't write reservation to database: %v", err)
+				} else {
+					response = getElements(c)
+
+					logger.Debug().Msgf("reserved element %q", mid)
+				}
 			}
 		}
 	}
@@ -580,8 +596,57 @@ func postElements(c *fiber.Ctx) responseMessage {
 	return response
 }
 
-func sendReservationEmail() {
+func getElementType(mid string) string {
+	switch strings.Split(mid, "-")[0] {
+	case "pv":
+		return "PV-Modul"
+	case "bs":
+		return "Batteriespeicher"
+	default:
+		return ""
+	}
+}
 
+func getElementID(mid string) string {
+	return strings.ToUpper(strings.Split(mid, "-")[1])
+}
+
+type ReservationData struct {
+	Mail        string
+	ElementType string
+	Element     string
+}
+
+func (data ReservationData) sendReservationEmail() error {
+	email := mail.NewMSG()
+
+	var headerBuffer bytes.Buffer
+	var bodyBuffer bytes.Buffer
+	var bodyBufferPlain bytes.Buffer
+
+	if err := config.Templates.Subject.Execute(&headerBuffer, data); err != nil {
+		return err
+	} else if err := config.Templates.Body.Execute(&bodyBuffer, data); err != nil {
+		return err
+	} else if err := config.Templates.BodyPlain.Execute(&bodyBufferPlain, data); err != nil {
+		return err
+	}
+
+	email.SetFrom(fmt.Sprintf("Klimaplus-Patenschaft <%s>", config.Mail.User)).AddTo(data.Mail).SetSubject(headerBuffer.String())
+
+	email.SetBody(mail.TextPlain, bodyBufferPlain.String())
+
+	email.AddAlternative(mail.TextHTML, bodyBuffer.String())
+
+	if mailClient, err := mailServer.Connect(); err != nil {
+		logger.Fatal().Msgf("can't connecto to mail-server: %v", err)
+
+		return err
+	} else if err := email.Send(mailClient); err != nil {
+		return err
+	} else {
+		return nil
+	}
 }
 
 // handles patch-requests for modifying element reservations

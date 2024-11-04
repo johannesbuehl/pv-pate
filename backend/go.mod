@@ -10,6 +10,7 @@ require (
 require (
 	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/kr/pretty v0.1.0 // indirect
+	github.com/toorop/go-dkim v0.0.0-20201103131630-e1cd1a0a5208 // indirect
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 )
 
@@ -27,6 +28,7 @@ require (
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.51.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
+	github.com/xhit/go-simple-mail/v2 v2.16.0
 	golang.org/x/crypto v0.28.0
 	golang.org/x/sys v0.26.0 // indirect
 	golang.org/x/text v0.19.0
