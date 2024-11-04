@@ -12,3 +12,5 @@ client_session:
   expire: 168h
 server:
   port: 61016
+reservation:
+  expiration: 168h

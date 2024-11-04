@@ -33,6 +33,9 @@ type ConfigYaml struct {
 	Server struct {
 		Port int `yaml:"port"`
 	} `yaml:"server"`
+	Reservation struct {
+		Expiration string `yaml:"expiration"`
+	} `yaml:"reservation"`
 }
 
 type CacheConfig struct {
@@ -40,11 +43,16 @@ type CacheConfig struct {
 	Purge      time.Duration
 }
 
+type ReservationConfig struct {
+	Expiration time.Duration
+}
+
 type ConfigStruct struct {
 	ConfigYaml
 	LogLevel      zerolog.Level
 	SessionExpire time.Duration
 	Cache         CacheConfig
+	Reservation   ReservationConfig
 }
 
 var config ConfigStruct
@@ -103,7 +111,7 @@ func loadConfig() ConfigStruct {
 	dec.KnownFields(true)
 	err = dec.Decode(&config)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error parsing config-file: %q", err.Error())
+		fmt.Fprintf(os.Stderr, "Error parsing config-file: %v", err)
 		os.Exit(1)
 	}
 
@@ -113,14 +121,17 @@ func loadConfig() ConfigStruct {
 		var configStruct ConfigStruct
 
 		if session_expire, err := time.ParseDuration(config.ClientSession.Expire); err != nil {
-			fmt.Fprintf(os.Stderr, `Error Parsing "client_session.expire": %q`, err.Error())
+			fmt.Fprintf(os.Stderr, `Error Parsing "client_session.expire": %v`, err)
 			os.Exit(1)
 		} else if cacheExpire, err := time.ParseDuration(config.Cache.Expiration); err != nil {
-			fmt.Fprintf(os.Stderr, `Error Parsing "cache.expiration": %q`, err.Error())
+			fmt.Fprintf(os.Stderr, `Error Parsing "cache.expiration": %v`, err)
 			os.Exit(1)
 		} else if cachePurge, err := time.ParseDuration(config.Cache.Purge); err != nil {
-			fmt.Fprintf(os.Stderr, `Error Parsing "cache.purge": %q`, err.Error())
+			fmt.Fprintf(os.Stderr, `Error Parsing "cache.purge": %v`, err)
 			os.Exit(1)
+
+		} else if reservationExpire, err := time.ParseDuration(config.Reservation.Expiration); err != nil {
+			fmt.Fprintf(os.Stderr, `Error Parsing "reservation.expiration": %v`, err)
 		} else {
 			configStruct = ConfigStruct{
 				ConfigYaml:    config,
@@ -129,6 +140,9 @@ func loadConfig() ConfigStruct {
 				Cache: CacheConfig{
 					Expiration: cacheExpire,
 					Purge:      cachePurge,
+				},
+				Reservation: ReservationConfig{
+					Expiration: reservationExpire,
 				},
 			}
 		}

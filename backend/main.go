@@ -130,13 +130,10 @@ func dbInsert(table string, vals any) error {
 	for ii := 0; ii < t.NumField(); ii++ {
 		fieldValue := v.Field(ii)
 
-		// skip empty (zero) values
-		if !fieldValue.IsZero() {
-			field := t.Field(ii)
+		field := t.Field(ii)
 
-			columns[ii] = strings.ToLower(field.Name)
-			values[ii] = fieldValue.Interface()
-		}
+		columns[ii] = strings.ToLower(field.Name)
+		values[ii] = fieldValue.Interface()
 	}
 
 	placeholders := strings.Repeat(("?, "), len(columns))
@@ -330,9 +327,14 @@ func checkAdmin(c *fiber.Ctx) (bool, error) {
 }
 
 // information about an element in the database
-type ElementDB struct {
+type ElementDBNoReservation struct {
 	Mid  string `json:"mid"`
 	Name string `json:"name"`
+}
+type ElementDB struct {
+	Mid         string  `json:"mid"`
+	Name        string  `json:"name"`
+	Reservation *string `json:"reservation"`
 }
 
 // client-data of the reserved elements
@@ -377,11 +379,14 @@ func getElements(c *fiber.Ctx) responseMessage {
 		}
 	}
 
-	response.Data = ClientStatus{
-		ReservedElements: elements.(map[string]string),
-	}
+	// if the reponse-status is still unset, there was no error
+	if response.Status == 0 {
+		response.Data = ClientStatus{
+			ReservedElements: elements.(map[string]string),
+		}
 
-	logger.Debug().Msg("retrieved elements")
+		logger.Debug().Msg("retrieved elements")
+	}
 
 	return response
 }
@@ -512,47 +517,54 @@ func isValidMid(element string) (bool, error) {
 func postElements(c *fiber.Ctx) responseMessage {
 	response := responseMessage{}
 
-	if user, err := checkUser(c); err != nil {
-		response.Status = fiber.StatusInternalServerError
+	body := struct{ Name string }{}
 
-		logger.Error().Msgf("can't check user: %v", err)
-	} else if !user {
-		response.Status = fiber.StatusUnauthorized
+	mid := c.Query("mid")
 
-		logger.Info().Msg("request is not authorized as user")
+	if ok, err := isValidMid(mid); err != nil || !ok {
+		response.Status = fiber.StatusBadRequest
+		response.Message = "invalid mID"
+
+		logger.Info().Msgf("can't reserve element: invalid element-name: %q", mid)
+	} else if err := c.BodyParser(&body); err != nil {
+		response.Status = fiber.StatusBadRequest
+		response.Message = "invalid message-body"
+
+		logger.Warn().Msg(`body can't be parsed as "struct{ name string }"`)
 	} else {
-		body := struct{ Name string }{}
+		elements, found := dbCache.Get("elements")
 
-		mid := c.Query("mid")
+		if !found {
+			if err := cacheElements(); err != nil {
+				response.Status = fiber.StatusInternalServerError
+				response.Message = "can't get elements"
 
-		if ok, err := isValidMid(mid); err != nil || !ok {
-			response.Status = fiber.StatusBadRequest
-			response.Message = "invalid element name"
+				logger.Error().Msgf("can't get elements from database: %v", err)
+			} else if elements, found = dbCache.Get("elements"); !found {
+				response.Status = fiber.StatusInternalServerError
+				response.Message = "can't get elements"
 
-			logger.Info().Msgf("can't reserve element: invalid element-name: %q", mid)
-		} else if err := c.BodyParser(&body); err != nil {
-			response.Status = fiber.StatusBadRequest
-			response.Message = "invalid message-body"
+				logger.Error().Msg("can't get 'elements' from cache")
+			}
+		}
 
-			logger.Warn().Msg(`body can't be parsed as "struct{ name string }"`)
-		} else {
+		// if the status is still unset, there was no error
+		if response.Status == 0 {
 			// check wether the element already exists
-			if elements, found := dbCache.Get("elements"); found {
-				if _, ok := elements.(map[string]string)[mid]; ok {
-					response.Status = fiber.StatusBadRequest
-					response.Message = "element is already reserved"
+			if _, ok := elements.(map[string]string)[mid]; ok {
+				response.Status = fiber.StatusBadRequest
+				response.Message = "element is already reserved"
 
-					logger.Info().Msgf("element %q is already reserved", mid)
+				logger.Info().Msgf("element %q is already reserved", mid)
 
-					return response
-				}
+				return response
 			}
 
 			// clear the current cache
 			dbCache.Delete("elements")
 
 			// write the data to the database
-			if err := dbInsert("elements", ElementDB{Mid: mid, Name: body.Name}); err != nil {
+			if err := dbInsert("elements", ElementDBNoReservation{Mid: mid, Name: body.Name}); err != nil {
 				response.Status = fiber.StatusInternalServerError
 				response.Message = "error while writing reservation to database"
 
@@ -566,6 +578,10 @@ func postElements(c *fiber.Ctx) responseMessage {
 	}
 
 	return response
+}
+
+func sendReservationEmail() {
+
 }
 
 // handles patch-requests for modifying element reservations
@@ -1200,5 +1216,5 @@ func main() {
 	}
 
 	// start the server
-	app.Listen(fmt.Sprintf(":%d", config.Server.Port))
+	app.Listen(fmt.Sprintf("localhost:%d", config.Server.Port))
 }
