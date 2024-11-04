@@ -45,7 +45,7 @@ type ConfigYaml struct {
 		Template struct {
 			Subject   string `json:"body"`
 			Body      string `yaml:"body"`
-			BodyPlain string `yaml:"body_lain"`
+			BodyPlain string `yaml:"body_plain"`
 		} `json:"template"`
 	} `yaml:"mail"`
 }

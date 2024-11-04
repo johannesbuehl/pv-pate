@@ -17,6 +17,8 @@
 
 		// if the form was submitted through the enter-key, let the user confirm
 		if (enter_press) {
+			enter_press = false;
+
 			let confirm_string = `Reservierung bestätigen?\nE-Mail: ${selected_element.value?.email}\n`;
 
 			if (selected_element.value?.name != undefined && selected_element.value?.name?.length > 1) {

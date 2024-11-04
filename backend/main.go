@@ -349,10 +349,33 @@ func cacheElements() error {
 	if res, err := dbSelect[ElementDB]("elements", "*"); err != nil {
 		return err
 	} else {
+		// delete all expired reservations
+		var expiredElements []any
+		expirationDate := time.Now().Add(-config.Reservation.Expiration)
+
 		elementMap := make(map[string]string)
 
 		for _, element := range res {
+			if element.Reservation != nil {
+				if reservationDate, err := time.Parse(time.DateTime, *element.Reservation); err == nil {
+					if reservationDate.Sub(expirationDate) < 0 {
+						expiredElements = append(expiredElements, element.Mid)
+
+						continue
+					}
+				}
+			}
+
 			elementMap[string(element.Mid[:])] = element.Name
+		}
+
+		if len(expiredElements) > 0 {
+			// remove the expired elements from the database
+			if _, err := db.Exec(fmt.Sprintf("DELETE FROM elements WHERE mid IN (%s?)", strings.Repeat("?, ", len(expiredElements)-1)), expiredElements...); err != nil {
+				logger.Error().Msgf("can't remove expired elements from database: %v", err)
+
+				return err
+			}
 		}
 
 		dbCache.Set("elements", elementMap, cache.DefaultExpiration)
@@ -573,7 +596,7 @@ func postElements(c *fiber.Ctx) responseMessage {
 			}
 
 			if err := data.sendReservationEmail(); err != nil {
-				logger.Error().Msgf("can't send reservation-mail")
+				logger.Error().Msgf("can't send reservation-mail: %v", err)
 			} else {
 				// clear the current cache
 				dbCache.Delete("elements")
