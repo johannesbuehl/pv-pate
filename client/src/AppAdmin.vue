@@ -13,8 +13,8 @@
 	import { ref, watch } from 'vue';
 	
 	import BasePV, { get_element_roof, get_element_type, type Element } from './components/BasePV.vue';
-	import { api_call, type APICallResult } from './lib';
-	import { reserved_elements, user, type ReservedElements } from './Globals';
+	import { api_call, get_element, is_element_available, type APICallResult } from './lib';
+	import { elements_db, user, type ElementsDB } from './Globals';
 	import AdminUsers from './components/AdminUsers.vue';
 	import BaseButton from './components/BaseButton.vue';
 	import AdminLogin from './components/AdminLogin.vue';
@@ -31,19 +31,19 @@
 	async function submit() {
 		// check wether a element is selected
 		if (selected_element.value !== undefined) {
-			let response: APICallResult<ReservedElements>;
+			let response: APICallResult<ElementsDB>;
 			
 			const name = selected_element.value.name !== "" ? selected_element.value.name : undefined;
 				
 			// if the element is already reserved, patch it instead
-			const method = reserved_elements.value[selected_element.value.mid] === undefined ? "POST" : "PATCH";
+			const method = is_element_available(selected_element.value.mid) ? "POST" : "PATCH";
 				
-			response = await api_call<{ reserved_elements: ReservedElements }>(method, "elements", { mid: selected_element.value.mid }, {
+			response = await api_call<ElementsDB>(method, "elements", { mid: selected_element.value.mid }, {
 				name
 			});
 			
 			if (response.ok) {
-				reserved_elements.value = (await response.json()).reserved_elements;
+				elements_db.value = (await response.json());
 				
 				selected_element.value = undefined;
 			} else {
@@ -57,11 +57,11 @@
 		if (selected_element.value !== undefined) {
 			const element_name = selected_element.value?.mid.match(/\w?\d+/)?.["0"].toUpperCase()
 			
-			if (confirm(`Reservierung für ${get_element_type(selected_element.value.mid)} ${element_name} mit dem Namen "${reserved_elements.value[selected_element.value.mid]}" löschen?`)) {
-				const response = await api_call<{ reserved_elements: ReservedElements }>("DELETE", "elements", { mid: selected_element.value.mid });
+			if (confirm(`Reservierung für ${get_element_type(selected_element.value.mid)} ${element_name} mit dem Namen "${get_element(selected_element.value.mid)?.name}" löschen?`)) {
+				const response = await api_call<ElementsDB>("DELETE", "elements", { mid: selected_element.value.mid });
 				
 				if (response.ok) {
-					reserved_elements.value = (await response.json()).reserved_elements;
+					elements_db.value = (await response.json());
 
 					selected_element.value.name = undefined;
 				}
@@ -103,7 +103,7 @@
 					</BaseButton>
 					<input type="text" id="input-name" v-model="selected_element.name" placeholder="Anonym" @keydown.enter="submit" />
 					<BaseButton
-						v-if="reserved_elements[selected_element.mid] === undefined"
+						v-if="is_element_available(selected_element.mid)"
 						@click="selected_element.name = undefined"
 					>
 						<FontAwesomeIcon :icon="faXmark" />

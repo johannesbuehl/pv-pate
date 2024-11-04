@@ -2,12 +2,12 @@
 	import { ref } from 'vue';
 
 	import BasePV, { get_element_roof, get_element_type, type Element } from './components/BasePV.vue';
-	import { reserved_elements, type ReservedElements } from './Globals';
 	import AppLayout from './components/AppLayout/AppLayout.vue';
 	import BaseButton from './components/BaseButton.vue';
 	import { faCheck } from '@fortawesome/free-solid-svg-icons';
 	import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-	import { api_call, type APICallResult } from './lib';
+	import { api_call, is_element_available, type APICallResult } from './lib';
+import { elements_db, type ElementsDB } from './Globals';
 
 	const selected_element = ref<Element & { email: string }>();
 
@@ -21,7 +21,7 @@
 
 			let confirm_string = `Reservierung bestätigen?\nE-Mail: ${selected_element.value?.email}\n`;
 
-			if (selected_element.value?.name != undefined && selected_element.value?.name?.length > 1) {
+			if (selected_element.value?.name != undefined && !selected_element.value.name && selected_element.value?.name?.length > 1) {
 				confirm_string += `Name: ${selected_element.value?.name}`;
 			} else {
 				confirm_string += `Ohne Namen`;
@@ -34,18 +34,18 @@
 
 		// check wether a element is selected
 		if (selected_element.value !== undefined) {
-			let response: APICallResult<ReservedElements>;
+			let response: APICallResult<ElementsDB>;
 			
 			// if the element is already reserved, patch it instead
-			const method = reserved_elements.value[selected_element.value.mid] === undefined ? "POST" : "PATCH";
+			const method = is_element_available(selected_element.value.mid) ? "POST" : "PATCH";
 				
-			response = await api_call<{ reserved_elements: ReservedElements }>(method, "elements", { mid: selected_element.value.mid }, {
+			response = await api_call<ElementsDB>(method, "elements", { mid: selected_element.value.mid }, {
 				name: selected_element.value.name,
 				mail: selected_element.value.email
 			});
 			
 			if (response.ok) {
-				reserved_elements.value = (await response.json()).reserved_elements;
+				elements_db.value = (await response.json());
 				
 				selected_element.value = undefined;
 			} else {
@@ -140,6 +140,7 @@
 				</tbody>
 			</table>
 		</div>
+		{{ elements_db }}
 		<BasePV
 			v-model:selected_element="selected_element"
 		>
@@ -152,18 +153,7 @@
 				v-if="selected_element !== undefined"
 			>
 				<div
-					v-if="reserved_elements[selected_element.mid] !== undefined"
-					id="tooltip-sold"
-				>
-					<template v-if="!!selected_element.name">
-						Pate für dieses Element ist {{ selected_element.name }}
-					</template>
-					<template v-else>
-						Dieses Element hat bereits einen Paten
-					</template>
-				</div>
-				<div
-					v-else
+					v-if="is_element_available(selected_element.mid)"
 					id="tooltip-buy"
 				>
 					Pate für {{ get_element_type(selected_element.mid, true) }} werden.<br>
@@ -183,6 +173,22 @@
 					</form>
 					Für unser Bauprojekt spenden: 
 					<a href="https://www.evkirchebuehl.de" target="_blank" rel="noopener noreferrer">Dummy-Link</a>
+				</div>
+				<div
+					v-else-if="selected_element.reserved"
+				>
+					Dieses Modul ist derzeit reserviert.
+				</div>
+				<div
+					v-else
+					id="tooltip-sold"
+				>
+					<template v-if="!!selected_element.name">
+						Pate für dieses Element ist {{ selected_element.name }}
+					</template>
+					<template v-else>
+						Dieses Element hat bereits einen Paten
+					</template>
 				</div>
 			</template>
 		</BasePV>

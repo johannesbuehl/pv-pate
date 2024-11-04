@@ -1,15 +1,21 @@
 import { ref } from "vue";
 import { api_call, HTTPStatus } from "./lib";
 
-export type ReservedElements = Record<string, string>;
+export interface ElementsDB {
+	taken: Record<string, string>;
+	reserved: string[];
+}
 
-export const reserved_elements = ref<ReservedElements>({});
+export const elements_db = ref<ElementsDB>({
+	reserved: [],
+	taken: {}
+});
 
 void (async () => {
-	const reserved_elements_request = api_call<{ reserved_elements: ReservedElements}>("GET", "elements");
+	const reserved_elements_request = api_call<ElementsDB>("GET", "elements");
 
 	if ((await reserved_elements_request).ok) {
-		reserved_elements.value = (await (await reserved_elements_request).json()).reserved_elements
+		elements_db.value = (await (await reserved_elements_request).json())
 	}
 })();
 

@@ -1,3 +1,6 @@
+import type { Element } from "./components/BasePV.vue";
+import { elements_db } from "./Globals";
+
 export enum HTTPStatus {
 	Continue = 100,
 	SwitchingProtocols = 101,
@@ -110,4 +113,26 @@ export async function api_call<K extends object>(
 	});
 
 	return response;
+}
+
+export function is_element_available(mid: string): boolean {
+	return elements_db.value.taken[mid] === undefined && !elements_db.value.reserved.includes(mid);
+}
+
+export function get_element(mid: string): Element | undefined {
+	if (elements_db.value.taken[mid] !== undefined) {
+		return {
+			mid,
+			name: elements_db.value.taken[mid]
+		};
+	}
+
+	if (elements_db.value.reserved.includes(mid)) {
+		return {
+			mid,
+			reserved: true
+		}
+	}
+
+	return undefined;
 }

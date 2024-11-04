@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"reflect"
 	"regexp"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -341,7 +342,13 @@ type ElementDB struct {
 
 // client-data of the reserved elements
 type ClientStatus struct {
-	ReservedElements map[string]string `json:"reserved_elements"`
+	Taken    map[string]string `json:"taken"`
+	Reserved []string          `json:"reserved"`
+}
+
+type ElementsCache struct {
+	Taken    map[string]string
+	Reserved []string
 }
 
 // caches the elements from the database
@@ -353,7 +360,8 @@ func cacheElements() error {
 		var expiredElements []any
 		expirationDate := time.Now().Add(-config.Reservation.Expiration)
 
-		elementMap := make(map[string]string)
+		takenElements := make(map[string]string)
+		reservedElements := []string{}
 
 		for _, element := range res {
 			if element.Reservation != nil {
@@ -364,9 +372,11 @@ func cacheElements() error {
 						continue
 					}
 				}
-			}
 
-			elementMap[string(element.Mid[:])] = element.Name
+				reservedElements = append(reservedElements, element.Mid)
+			} else {
+				takenElements[element.Mid] = element.Name
+			}
 		}
 
 		if len(expiredElements) > 0 {
@@ -378,7 +388,10 @@ func cacheElements() error {
 			}
 		}
 
-		dbCache.Set("elements", elementMap, cache.DefaultExpiration)
+		dbCache.Set("elements", ElementsCache{
+			Taken:    takenElements,
+			Reserved: reservedElements,
+		}, cache.DefaultExpiration)
 
 		return nil
 	}
@@ -400,14 +413,16 @@ func getElements(c *fiber.Ctx) responseMessage {
 			response.Status = fiber.StatusInternalServerError
 			response.Message = "can't get elements"
 
-			logger.Error().Msg("can't get 'elements' from cache")
+			logger.Error().Msg(`can't get "elements" from cache`)
 		}
 	}
 
 	// if the reponse-status is still unset, there was no error
 	if response.Status == 0 {
+
 		response.Data = ClientStatus{
-			ReservedElements: elements.(map[string]string),
+			Taken:    elements.(ElementsCache).Taken,
+			Reserved: elements.(ElementsCache).Reserved,
 		}
 
 		logger.Debug().Msg("retrieved elements")
@@ -579,13 +594,18 @@ func postElements(c *fiber.Ctx) responseMessage {
 		// if the status is still unset, there was no error
 		if response.Status == 0 {
 			// check wether the element already exists
-			if _, ok := elements.(map[string]string)[mid]; ok {
+			if _, ok := elements.(ElementsCache).Taken[mid]; ok {
 				response.Status = fiber.StatusBadRequest
-				response.Message = "element is already reserved"
+				response.Message = "element is already taken"
 
-				logger.Info().Msgf("element %q is already reserved", mid)
+				logger.Info().Msgf("element %q is already taken", mid)
 
 				return response
+			} else if slices.Contains(elements.(ElementsCache).Reserved, mid); ok {
+				response.Status = fiber.StatusBadRequest
+				response.Message = "element is currently reserved"
+
+				logger.Info().Msgf("element %q is currently reserved", mid)
 			}
 
 			// send the reservation e-mail

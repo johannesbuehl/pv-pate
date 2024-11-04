@@ -1,5 +1,5 @@
 <script lang="ts">
-	export interface Element { mid: string; name?: string; }
+	export interface Element { mid: string; name?: string; reserved?: boolean; }
 
 	const element_type_map: Record<string, string> = {
 			pv: "PV-Modul",
@@ -40,9 +40,8 @@
 <script setup lang="ts">
 	import { onBeforeMount, onMounted, onUnmounted, ref } from 'vue';
 	
-	import { reserved_elements, type ReservedElements } from '@/Globals';
-
 	import BaseTooltip from './BaseTooltip.vue';
+	import { is_element_available, get_element } from '@/lib';
 
 	const svg = ref<string>();
 
@@ -69,7 +68,7 @@
 		selected_element.value = undefined;
 	}
 
-	function prepare_svg(r: string, reserved_elements: ReservedElements): string {
+	function prepare_svg(r: string): string {
 		const parser = new DOMParser();
 		const svg_dom = parser.parseFromString(r, "image/svg+xml").documentElement;
 
@@ -87,7 +86,7 @@
 
 			ele.classList.add(classname);
 
-			if (reserved_elements[ele.id] !== undefined) {
+			if (!is_element_available(ele.id)) {
 				ele.classList.add("sold");
 			}
 		}
@@ -127,13 +126,8 @@
 			svg_selected_element.value = target as SVGRectElement;
 			const mid = svg_selected_element.value?.id;
 
-			let reserved_element_text = reserved_elements.value[mid];
+			selected_element.value = get_element(mid);
 
-			selected_element.value = {
-				mid,
-				name: reserved_element_text
-			};
-			
 			svg_selected_element.value.classList.add("selected");
 		}
 	}
@@ -147,7 +141,7 @@
 			v-if="!!svg"
 			id="div-svg"
 			ref="svg_wrapper"
-			v-html="prepare_svg(svg, reserved_elements)"
+			v-html="prepare_svg(svg)"
 		></div>
 	</div>
 	<Transition>

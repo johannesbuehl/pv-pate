@@ -12,7 +12,7 @@ Source-code for the fundraising-website of our photovoltaic-system
 
 # reservations
 - add confirm
-- text for reserved but not godfathered elements
+- text for reserved but not taken
 
 ## admin-panel
 - list of reserved modules: confirm or deny
