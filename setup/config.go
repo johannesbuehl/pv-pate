@@ -30,6 +30,20 @@ type ConfigYaml struct {
 	Server struct {
 		Port int `yaml:"port"`
 	} `yaml:"server"`
+	Reservation struct {
+		Expiration string `yaml:"expiration"`
+	} `yaml:"reservation"`
+	Mail struct {
+		Server   string `yaml:"server"`
+		Port     int    `yaml:"port"`
+		User     string `yaml:"user"`
+		Password string `yaml:"password"`
+		Template struct {
+			Subject   string `json:"body"`
+			Body      string `yaml:"body"`
+			BodyPlain string `yaml:"body_plain"`
+		} `json:"template"`
+	} `yaml:"mail"`
 }
 
 type CacheConfig struct {
