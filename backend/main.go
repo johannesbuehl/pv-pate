@@ -898,6 +898,53 @@ func getSponsorships(c *fiber.Ctx) responseMessage {
 	return response
 }
 
+func getCertificates(c *fiber.Ctx) responseMessage {
+	var response responseMessage
+
+	if ok, err := checkUser(c); err != nil {
+		response.Status = fiber.StatusInternalServerError
+
+		logger.Error().Msgf("can't check for user: %v", err)
+	} else if !ok {
+		response.Status = fiber.StatusUnauthorized
+	} else if mid := c.Query("mid"); mid == "" {
+		response.Status = fiber.StatusBadRequest
+		response.Message = "query doesn't include mid"
+
+		logger.Info().Msg("query doesn't include mid")
+	} else {
+		// get the element from the database
+		if res, err := dbSelect[ElementDB]("elements", "mid = ?", mid); err != nil {
+			response.Status = fiber.StatusInternalServerError
+
+			logger.Error().Msgf("can't get element %q from database: %v", mid, err)
+		} else if len(res) != 1 {
+			response.Status = fiber.StatusBadRequest
+			response.Message = "query doesn't include valid mid"
+
+			logger.Info().Msgf("query doesn't include valid mid: %q", mid)
+		} else {
+			// create the pdf
+			certData := CertificateData{
+				Element: mid,
+				Name:    res[0].Name,
+			}
+
+			if err := certData.create(); err != nil {
+				response.Status = fiber.StatusInternalServerError
+
+				logger.Error().Msgf("can't create certificate for %q; %v", mid, err)
+			} else {
+				defer certData.cleanup()
+
+				c.SendFile(certData.PDFFile)
+			}
+		}
+	}
+
+	return response
+}
+
 // validates a password against the password-rules
 func validatePassword(password string) bool {
 	return len(password) >= 12 && len(password) <= 64
@@ -1543,6 +1590,7 @@ func main() {
 			"users":        getUsers,
 			"reservations": getReservations,
 			"sponsorships": getSponsorships,
+			"certificates": getCertificates,
 		},
 		"POST": {
 			"elements":     postElements,

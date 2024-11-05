@@ -10,7 +10,7 @@
 	import { api_call } from '@/lib';
 	import { onMounted, ref, watch } from 'vue';
 import { get_element_roof, get_element_string } from './BasePV.vue';
-import { faSdCard, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faDownload, faSdCard, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import BaseButton from './BaseButton.vue';
 
@@ -51,6 +51,10 @@ import BaseButton from './BaseButton.vue';
 			}
 		}
 	}
+
+	async function get_certificate(mid: string) {
+		// const response = await api_call()
+	}
 </script>
 
 <template>
@@ -61,6 +65,7 @@ import BaseButton from './BaseButton.vue';
 			<tr>
 				<th>Element</th>
 				<th>Name</th>
+				<th>Zertifikat</th>
 				<th>Löschen</th>
 			</tr>
 		</thead>
@@ -78,6 +83,18 @@ import BaseButton from './BaseButton.vue';
 					>
 						<FontAwesomeIcon :icon="faSdCard" />
 					</BaseButton>
+				</th>
+				<th>
+					<form
+						action="/pv/api/certificates"
+						target="_blank"
+					>
+						<input type="text" name="mid" style="display: none;" :value="sponsorship.mid" />
+						<input type="submit" :id="`get-certificate-submit-${sponsorship.mid}`" style="display: none;" />
+						<label :for="`get-certificate-submit-${sponsorship.mid}`">
+							<BaseButton @click="get_certificate(sponsorship.mid)"><FontAwesomeIcon :icon="faDownload" /></BaseButton>
+						</label>
+					</form>
 				</th>
 				<th><BaseButton @click="delete_sponsorship(sponsorship.mid)"><FontAwesomeIcon :icon="faTrash" /></BaseButton></th>
 			</tr>
