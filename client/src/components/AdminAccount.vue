@@ -45,6 +45,9 @@
 				password_current.value = "";
 				password_new.value = "";
 				password_repeat.value = "";
+
+				// reload the page since the users get's logged out
+				location.reload()
 			}
 		}
 	}
