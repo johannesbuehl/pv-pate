@@ -12,8 +12,8 @@ input, button {
 
 body {
 	font-family: var(--font-default);
-	
-	margin: 0.5em;
+
+	margin: 0;
 
 	font-size: 1.5em;
 
@@ -37,6 +37,10 @@ a:active {
 
 p, ul {
 	margin: unset;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	color: var(--v-color-blue);
 }
 
 

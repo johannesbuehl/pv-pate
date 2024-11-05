@@ -6,33 +6,49 @@ import BaseStatic from '@/BaseStatic.vue';
 <template>
 	<BaseStatic>
 		<h1>Datenschutz</h1>
-		<h2>I. Informationen über die Verarbeitung Ihrer Daten gemäß Art. 13 der Datenschutz-Grundverordnung (DS-GVO)</h2>
-		<h3>1. Verantwortlicher und Datenschutzbeauftragter</h3>
-		<p>Verantwortlich für diese Website ist Simon Ziegler:</p>
-		<p>simon.ziegler.1998+z2glr.uber.space@pm.me</p>
-		<h3>2.Daten, die für die Bereitstellung der Website und die Erstellung der Protokolldateien verarbeitet werden</h3>
-		<h4>a. Welche Daten werden für welchen Zweck verarbeitet?</h4>
-		<p>Bei jedem Zugriff auf Inhalte der Website werden vorübergehend Daten gespeichert, die möglicherweise eine Identifizierung zulassen. Die folgenden Daten werden hierbei erhoben:</p>
-		<ul>
-		<li>Datum und Uhrzeit des Zugriffs</li>
-		<li>IP-Adresse (IPv4: die ersten 2 Bytes, IPv6: die ersten 4 Bytes)</li>
-		<li>Hostname des zugreifenden Rechners</li>
-		<li>Website, von der aus die Website aufgerufen wurde</li>
-		<li>Websites, die über die Website aufgerufen werden</li>
-		<li>Besuchte Seite auf unserer Website</li>
-		<li>Meldung, ob der Abruf erfolgreich war</li>
-		<li>Übertragene Datenmenge</li>
-		<li>Informationen über den Browsertyp und die verwendete Version</li>
-		<li>Betriebssystem</li>
-		</ul>
-		<p>Wenn Sie der Ansicht sind, dass die Verarbeitung Ihrer personenbezogenen Daten gegen Datenschutzrecht verstößt, haben Sie nach Ar. 77 Abs. 1 DS-GVO das Recht, sich bei einer Datenschutzaufsichtsbehörde eigener Wahl zu beschweren. Hierzu gehört auch die für den Verantwortlichen zuständige Datenschutzaufsichtsbehörde: Landesbeauftragter für Datenschutz und Informationsfreiheit Baden-Württemberg, <a href="https://www.baden-wuerttemberg.datenschutz.de/beschwerde">https://www.baden-wuerttemberg.datenschutz.de/beschwerde.</a></p>
-		<h4>g. Recht auf Datenübertragbarkeit</h4>
-		<p>Für den Fall, dass die Voraussetzungen des Art. 20 Abs. 1 DS-GVO vorliegen, steht Ihnen das Recht zu, sich Daten, die wir auf Grundlage Ihrer Einwilligung oder in Erfüllung eines Vertrags automatisiert verarbeiten, an sich oder an Dritte aushändigen zu lassen. Die Erfassung der Daten zur Bereitstellung der Website und die Speicherung der Protokolldateien sind für den Betrieb der Internetseite zwingend erforderlich. Sie beruhen daher nicht auf einer Einwilligung nach Art. 6 Abs. 1 Buchstabe a DS-GVO oder auf einem Vertrag nach Art. 6 Abs. 1 Buchstabe b DS-GVO, sondern sind nach Art. 6 Abs. 1 Buchstabe f DS-GVO gerechtfertigt. Die Voraussetzungen des Art. 20 Abs. 1 DS-GVO sind demnach insoweit nicht erfüllt.</p>
-		<h2>II. Recht auf Widerspruch gemäß Art. 21 Abs. 1 DS-GVO</h2>
-		<p>Sie haben das Recht, aus Gründen, die sich aus Ihrer besonderen Situation ergeben, jederzeit gegen die Verarbeitung Ihrer personenbezogenen Daten, die aufgrund von Artikel 6 Abs. 1 Buchstabe f DS-GVO erfolgt, Widerspruch einzulegen. Der Verantwortliche verarbeitet die personenbezogenen Daten dann nicht mehr, es sei denn, er kann
-		zwingende schutzwürdige Gründe für die Verarbeitung nachweisen, die die Interessen, Rechte und Freiheiten der betroffenen Person überwiegen, oder die Verarbeitung dient der Geltendmachung, Ausübung oder Verteidigung von Rechtsansprüchen. Die Erfassung der Daten zur Bereitstellung der Website und die Speicherung der Protokolldateien sind für den Betrieb der Internetseite zwingend erforderlich.</p>
+		<h2>Datenschutzhinweise - Evangelische Kirchengemeinde Bühl</h2>
+		<p>
+			Wir nehmen den Schutz Ihrer personenbezogenen Daten ernst und beachten die Regeln der anwendbaren Datenschutzgesetze. Es ist uns wichtig, dass Sie jederzeit wissen, welche personenbezogenen Daten während Ihres Besuchs auf unserer Webseite und bei Nutzung unserer Angebote erhoben werden und wie wir sie verwenden.<br>
+			Personenbezogene Daten sind Einzelangaben über persönliche und sachliche Verhältnisse einer bestimmten oder bestimmbaren natürlichen Person.<br>
+			Mit den nachfolgenden Hinweisen möchten wir Sie über die Erhebung und Verarbeitung Ihrer Daten auf unseren Webseiten informieren:
+		</p>
+
+		<h2>Cookies</h2>
+		<p>
+			Diese Seite nutzt Cookies ausschließlich für den Login im Admin-Panel. Dieses Session-Cookie beinhaltet Session-Token, User-ID, Token-ID. Als technisch notwendiges Cookie benötigt dies keiner Zustimmung.
+		</p>
+		<p>
+			Bei regulären Besuchern werden keine Cookies gespeichert.
+		</p>
+
+		<h2>Datenschutzrechtlich verantwortliche Stelle</h2>
+		Die datenschutzrechtlich verantwortliche Stelle ist im Impressum unserer Webseite näher bezeichnet. Sprechen Sie uns bei Fragen gerne über die dort hinterlegten Kontaktdaten an.
 	</BaseStatic>	
 </template>
 
 <style scoped>
+	p {
+		margin-block: 0.55em;
+	}
+
+	p.container {
+		margin-block: 1em;
+	}
+
+	a {
+		color: var(--v-color-blue);
+	}
+
+	h2, h3 {
+		margin-top: 1em;
+		margin-bottom: 0.25em;
+	}
+
+	h3 {
+		color: unset;
+	}
+
+	ul {
+		margin-block: 1em;
+	}
 </style>

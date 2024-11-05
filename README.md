@@ -9,6 +9,3 @@ Source-code for the fundraising-website of our photovoltaic-system
 - add second certificate for empty names
 - improve certificate-email test and header
 - certificate: use better formatted names
-- adjust about
-- adjust impressum
-- adjust datenschuty

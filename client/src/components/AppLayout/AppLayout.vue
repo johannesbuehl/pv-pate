@@ -13,7 +13,6 @@
 
 	const footer_sites = {
 		/* eslint-disable @typescript-eslint/naming-convention */
-		About: "/about",
 		Datenschutz: "/legal/datenschutz",
 		Impressum: "/legal/impressum"
 		/* eslint-enable @typescript-eslint/naming-convention */
@@ -122,8 +121,6 @@
 
 	.active {
 		font-weight: bold;
-
-		text-decoration: underline;
 	}
 </style>
 
@@ -133,7 +130,9 @@
 		flex-direction: column;
 		align-items: center;
 		gap: 0.5em;
-		
+
+		padding: 0.5em;
+
 		min-height: 100cqh;
 	}
 </style>

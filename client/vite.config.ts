@@ -26,7 +26,6 @@ export default defineConfig({
 		  input: {
 			  index: resolve(__dirname, "src/index.html"),
 			  admin: resolve(__dirname, "src/admin.html"),
-			  about: resolve(__dirname, "src/about.html"),
 			  datenschutz: resolve(__dirname, "src/legal/datenschutz.html"),
 			  impressum: resolve(__dirname, "src/legal/impressum.html"),
 		  }
