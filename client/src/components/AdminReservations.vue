@@ -1,6 +1,7 @@
 <script lang="ts">
 	interface Reservation {
 		name: string;
+		new_name: string;
 		reservation: string;
 		mid: string;
 	}
@@ -8,9 +9,9 @@
 
 <script setup lang="ts">
 	import { api_call } from '@/lib';
-import { faEuro, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faEuro, faSdCard, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import BaseButton from './BaseButton.vue';
 import { get_element_roof, get_element_string } from './BasePV.vue';
 
@@ -24,9 +25,14 @@ import { get_element_roof, get_element_string } from './BasePV.vue';
 		}
 	});
 
+	// on new reservations, populate new_name
+	watch(reservations, (reservations) => {
+		reservations?.forEach(reservation => reservation.new_name = reservation.name);
+	});
+
 	async function confirm_reservation(mid: string) {
 		if (confirm(`Reservierung für ${get_element_roof(mid)} bestätigen?`)) {
-			const response = await api_call<Reservation[]>("POST", "reservations", { q: "confirm", mid })
+			const response = await api_call<Reservation[]>("POST", "reservations", { mid })
 
 			if (response.ok) {
 				reservations.value = await response.json();
@@ -40,6 +46,19 @@ import { get_element_roof, get_element_string } from './BasePV.vue';
 			
 			if (response.ok) {
 				reservations.value = await response.json();
+			}
+		}
+	}
+
+	async function update_reservation(reservation: Reservation) {
+		// if name and new_name are the same, do nothing
+		if (reservation.name !== reservation.new_name) {
+			if (confirm(`Reservierung für ${get_element_roof(reservation.mid)} aktualiseren?\nVon "${reservation.name}" zu "${reservation.new_name}"`)) {
+				const response = await api_call<Reservation[]>("PATCH", "reservations", { mid: reservation.mid }, { name: reservation.new_name });
+				
+				if (response.ok) {
+					reservations.value = await response.json();
+				}
 			}
 		}
 	}
@@ -64,7 +83,15 @@ import { get_element_roof, get_element_string } from './BasePV.vue';
 				:key="reservation.mid"
 			>
 				<th>{{ get_element_string(reservation.mid) }}</th>
-				<th>{{ reservation.name }}</th>
+				<th class="name-cell">
+					<input type="text" v-model="reservation.new_name" @keydown.enter="update_reservation(reservation)" />
+					<BaseButton
+						:disabled="reservation.name === reservation.new_name"
+						@click="update_reservation(reservation)"
+					>
+						<FontAwesomeIcon :icon="faSdCard" />
+					</BaseButton>
+				</th>
 				<th>{{ reservation.reservation }}</th>
 				<th><BaseButton @click="confirm_reservation(reservation.mid)"><FontAwesomeIcon :icon="faEuro" /></BaseButton></th>
 				<th><BaseButton @click="delete_reservation(reservation.mid)"><FontAwesomeIcon :icon="faTrash" /></BaseButton></th>
@@ -95,19 +122,10 @@ import { get_element_roof, get_element_string } from './BasePV.vue';
 		font-weight: normal;
 	}
 
-	th > div.cell {
-		width: 100%;
-
+	th.name-cell {
 		display: flex;
 		align-items: center;
-		justify-content: center;
-	}
 
-	th input[type="text"] {
-		flex: 1;
-	}
-
-	tbody > tr input[type="text"] {
-		font-size: 0.67em;
+		gap: 0.25em;
 	}
 </style>

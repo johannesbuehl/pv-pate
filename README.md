@@ -15,4 +15,3 @@ Source-code for the fundraising-website of our photovoltaic-system
 ## admin-panel
 - list of reserved modules: confirm or deny -> create and send pdf on confirm
 - change name of reservation / rework elements-view (keep as is but implement actions for reserved modules)
-- make reservation name adjustable
