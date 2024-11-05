@@ -9,10 +9,10 @@ Source-code for the fundraising-website of our photovoltaic-system
 - implement proper donation link
 - move to login-screen after password reset
 - create mail-template-file
-- limmit reservation name length through input max-length
 
 # reservations
 
 ## admin-panel
 - list of reserved modules: confirm or deny -> create and send pdf on confirm
-- change name of reservation / rework elements-view
+- change name of reservation / rework elements-view (keep as is but implement actions for reserved modules)
+- make reservations default panel

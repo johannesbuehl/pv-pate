@@ -162,7 +162,7 @@ import { elements_db, type ElementsDB } from './Globals';
 						@keydown.enter="enter_press = true"
 					>
 						<input type="email" name="mail" id="input-email" v-model="selected_element.email" placeholder="E-Mail" required />
-						<input type="text" name="name" id="input-name" v-model="selected_element.name" placeholder="Name (optional)" />
+						<input type="text" name="name" id="input-name" maxlength="70" v-model="selected_element.name" placeholder="Name (optional)" />
 						<input type="submit" style="display: none;" id="submit-reservation" />
 						<label for="submit-reservation">
 								<BaseButton>
