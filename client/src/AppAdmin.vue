@@ -2,6 +2,7 @@
 	enum WindowState {
 		Login,
 		Reservations,
+		Sponsorships,
 		Elements,
 		Account,
 		Users
@@ -21,7 +22,8 @@
 	import AdminLogin from './components/AdminLogin.vue';
 	import AdminAccount from './components/AdminAccount.vue';
 	import AppLayout from './components/AppLayout/AppLayout.vue';
-import AdminReservations from './components/AdminReservations.vue';
+	import AdminReservations from './components/AdminReservations.vue';
+import AdminSponsorships from './components/AdminSponsorships.vue';
 
 	const window_state = ref<WindowState>(WindowState.Login);
 	const selected_element = ref<Element>();
@@ -84,12 +86,14 @@ import AdminReservations from './components/AdminReservations.vue';
 	<AppLayout>
 		<template #header>
 			<a class="navbar-item" :class="{ active: window_state === WindowState.Reservations }" @click="window_state = WindowState.Reservations">Reservierungen</a>
+			<a class="navbar-item" :class="{ active: window_state === WindowState.Sponsorships }" @click="window_state = WindowState.Sponsorships">Patenschaften</a>
 			<a class="navbar-item" :class="{ active: window_state === WindowState.Elements }" @click="window_state = WindowState.Elements">Elemente</a>
 			<a class="navbar-item" :class="{ active: window_state === WindowState.Account }" @click="window_state = WindowState.Account">Account</a>
 			<a v-if="user?.name === 'admin'" class="navbar-item" :class="{ active: window_state === WindowState.Users }" @click="window_state = WindowState.Users">Benutzer</a>
 		</template>
 		<AdminLogin v-if="window_state === WindowState.Login" v-model="user" />
 		<AdminReservations v-else-if="window_state === WindowState.Reservations" />
+		<AdminSponsorships v-else-if="window_state === WindowState.Sponsorships" />
 		<BasePV
 			v-else-if="window_state === WindowState.Elements"
 			v-model:selected_element="selected_element"

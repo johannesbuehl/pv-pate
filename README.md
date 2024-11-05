@@ -6,7 +6,6 @@ Source-code for the fundraising-website of our photovoltaic-system
 - move list of valid mids and regex out of source-code
 - implement proper donation link
 - create mail-template-file
-- admin-panel: view with taken elements ("Patenschaften")
 
 # reservations
 ## admin-panel

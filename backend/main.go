@@ -873,6 +873,31 @@ func getReservations(c *fiber.Ctx) responseMessage {
 	return response
 }
 
+func getSponsorships(c *fiber.Ctx) responseMessage {
+	var response responseMessage
+
+	if ok, err := checkUser(c); err != nil {
+		response.Status = fiber.StatusInternalServerError
+
+		logger.Error().Msgf("can't check for user: %v", err)
+	} else if !ok {
+		response.Status = fiber.StatusUnauthorized
+
+		logger.Info().Msg("request in not authorized")
+	} else {
+		if res, err := dbSelect[ElementDBNoReservation]("elements", "reservation IS NULL"); err != nil {
+			response.Status = fiber.StatusInternalServerError
+
+			logger.Error().Msgf("can't get sponsored elements from database: %v", err)
+		} else {
+
+			response.Data = res
+		}
+	}
+
+	return response
+}
+
 // validates a password against the password-rules
 func validatePassword(password string) bool {
 	return len(password) >= 12 && len(password) <= 64
@@ -955,6 +980,8 @@ func postReservations(c *fiber.Ctx) responseMessage {
 
 			logger.Error().Msgf("can't write reservation-confirm to database for %q: %v", mid, err)
 		} else {
+			dbCache.Delete("elements")
+
 			response = getReservations(c)
 		}
 	}
@@ -1116,6 +1143,37 @@ func deleteReservations(c *fiber.Ctx) responseMessage {
 	return response
 }
 
+func deleteSponsorships(c *fiber.Ctx) responseMessage {
+	var response responseMessage
+
+	if ok, err := checkUser(c); err != nil {
+		response.Status = fiber.StatusInternalServerError
+
+		logger.Error().Msgf("can't check for user: %v", err)
+	} else if !ok {
+		response.Status = fiber.StatusUnauthorized
+
+		// check for mid in query
+	} else if mid := c.Query("mid"); mid == "" {
+		response.Status = fiber.StatusBadRequest
+		response.Message = "query doesn't include valid mid"
+
+		logger.Info().Msg("query doesn't include valid mid")
+	} else {
+		if err := dbDelete("elements", struct{ Mid string }{Mid: mid}); err != nil {
+			response.Status = fiber.StatusInternalServerError
+
+			logger.Error().Msgf("error while removing sponsorship for element %q from database: %v", mid, err)
+		} else {
+			dbCache.Delete("elements")
+
+			response = getSponsorships(c)
+		}
+	}
+
+	return response
+}
+
 // handles patch-requests to change the users password
 func patchUserPassword(c *fiber.Ctx) responseMessage {
 	response := responseMessage{}
@@ -1186,7 +1244,46 @@ func patchReservations(c *fiber.Ctx) responseMessage {
 			// update the database with the new name
 			dbUpdate("elements", body, struct{ Mid string }{Mid: mid})
 
+			dbCache.Delete("elements")
+
 			response = getReservations(c)
+		}
+	}
+
+	return response
+}
+
+func patchSponsorships(c *fiber.Ctx) responseMessage {
+	var response responseMessage
+
+	if ok, err := checkUser(c); err != nil {
+		response.Status = fiber.StatusInternalServerError
+
+		logger.Error().Msgf("can't check user: %v", err)
+	} else if !ok {
+		response.Status = fiber.StatusUnauthorized
+
+		// check for mid in query
+	} else if mid := c.Query("mid"); mid == "" {
+		response.Status = fiber.StatusBadRequest
+		response.Message = "query doesn't include valid mid"
+
+		logger.Info().Msg("query doesn't include valid mid")
+	} else {
+		// parse the body
+		body := struct{ Name string }{}
+
+		if err := c.BodyParser(&body); err != nil {
+			response.Status = fiber.StatusBadRequest
+
+			logger.Warn().Msg(`body can't be parsed as "struct{ name string }"`)
+		} else {
+			// update the database with the new name
+			dbUpdate("elements", body, struct{ Mid string }{Mid: mid})
+
+			dbCache.Delete("elements")
+
+			response = getSponsorships(c)
 		}
 	}
 
@@ -1419,6 +1516,7 @@ func main() {
 			"elements":     getElements,
 			"users":        getUsers,
 			"reservations": getReservations,
+			"sponsorships": getSponsorships,
 		},
 		"POST": {
 			"elements":     postElements,
@@ -1430,11 +1528,13 @@ func main() {
 			"users":         patchUsers,
 			"user/password": patchUserPassword,
 			"reservations":  patchReservations,
+			"sponsorships":  patchSponsorships,
 		},
 		"DELETE": {
 			"elements":     deleteElements,
 			"users":        deleteUsers,
 			"reservations": deleteReservations,
+			"sponsorships": deleteSponsorships,
 		},
 	}
 
