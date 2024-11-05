@@ -1046,7 +1046,7 @@ func postReservations(c *fiber.Ctx) responseMessage {
 
 				logger.Error().Msgf("can't send certificate for %q: %v", mid, err)
 			} else {
-				if err := dbUpdate("elements", struct{ Reservation *string }{Reservation: nil}, struct{ Mid string }{Mid: mid}); err != nil {
+				if _, err := db.Exec("UPDATE elements SET reservation = NULL WHERE mid = ?", mid); err != nil {
 					response.Status = fiber.StatusInternalServerError
 
 					logger.Error().Msgf("can't write reservation-confirm to database for %q: %v", mid, err)

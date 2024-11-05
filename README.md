@@ -9,3 +9,6 @@ Source-code for the fundraising-website of our photovoltaic-system
 - add second certificate for empty names
 - improve certificate-email test and header
 - certificate: use better formatted names
+- simplify uploading non-git files to server (fonts, elements, inkscape, certificate-template) rsync-script?
+- change log-name
+- download certificates instead of mail
