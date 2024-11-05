@@ -53,9 +53,9 @@ import { get_element_roof, get_element_string } from './BasePV.vue';
 			<tr>
 				<th>Element</th>
 				<th>Name</th>
-				<th>Date</th>
-				<th>Confirm</th>
-				<th>Delete</th>
+				<th>Reservierungsdatum</th>
+				<th>Bestätigen</th>
+				<th>Löschen</th>
 			</tr>
 		</thead>
 		<tbody>
