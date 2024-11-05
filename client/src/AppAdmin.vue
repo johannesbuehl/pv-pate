@@ -1,8 +1,8 @@
 <script lang="ts">
 	enum WindowState {
 		Login,
-		Elements,
 		Reservations,
+		Elements,
 		Account,
 		Users
 	}
@@ -27,7 +27,7 @@ import AdminReservations from './components/AdminReservations.vue';
 	const selected_element = ref<Element>();
 
 	watch(user, user => {
-			window_state.value = user?.logged_in ? WindowState.Elements : WindowState.Login
+			window_state.value = user?.logged_in ? WindowState.Reservations : WindowState.Login
 	}, { deep: true })
 
 	async function submit() {
@@ -81,6 +81,7 @@ import AdminReservations from './components/AdminReservations.vue';
 			<a v-if="user?.name === 'admin'" class="navbar-item" :class="{ active: window_state === WindowState.Users }" @click="window_state = WindowState.Users">Benutzer</a>
 		</template>
 		<AdminLogin v-if="window_state === WindowState.Login" v-model="user" />
+		<AdminReservations v-else-if="window_state === WindowState.Reservations" />
 		<BasePV
 			v-else-if="window_state === WindowState.Elements"
 			v-model:selected_element="selected_element"
@@ -120,7 +121,6 @@ import AdminReservations from './components/AdminReservations.vue';
 				</template>
 			</div>
 		</BasePV>
-		<AdminReservations v-else-if="window_state === WindowState.Reservations" />
 		<AdminAccount v-else-if="window_state === WindowState.Account" />
 		<AdminUsers v-else-if="window_state === WindowState.Users" />
 	</AppLayout>
