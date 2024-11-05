@@ -950,19 +950,12 @@ func postReservations(c *fiber.Ctx) responseMessage {
 
 		logger.Info().Msg("query doesn't include valid mid")
 	} else {
-		switch c.Query("q") {
-		default:
-			response.Status = fiber.StatusBadRequest
+		if err := dbUpdate("elements", struct{ Reservation *string }{Reservation: nil}, struct{ Mid string }{Mid: mid}); err != nil {
+			response.Status = fiber.StatusInternalServerError
 
-		// confirm the reservation
-		case "confirm":
-			if err := dbUpdate("elements", struct{ Reservation *string }{Reservation: nil}, struct{ Mid string }{Mid: mid}); err != nil {
-				response.Status = fiber.StatusInternalServerError
-
-				logger.Error().Msgf("can't write reservation-confirm to database for %q: %v", mid, err)
-			} else {
-				response = getReservations(c)
-			}
+			logger.Error().Msgf("can't write reservation-confirm to database for %q: %v", mid, err)
+		} else {
+			response = getReservations(c)
 		}
 	}
 
@@ -1159,6 +1152,41 @@ func patchUserPassword(c *fiber.Ctx) responseMessage {
 			// everything is valid
 
 			return changePassword(uid, body.Password)
+		}
+	}
+
+	return response
+}
+
+func patchReservations(c *fiber.Ctx) responseMessage {
+	var response responseMessage
+
+	if ok, err := checkUser(c); err != nil {
+		response.Status = fiber.StatusInternalServerError
+
+		logger.Error().Msgf("can't check user: %v", err)
+	} else if !ok {
+		response.Status = fiber.StatusUnauthorized
+
+		// check for mid in query
+	} else if mid := c.Query("mid"); mid == "" {
+		response.Status = fiber.StatusBadRequest
+		response.Message = "query doesn't include valid mid"
+
+		logger.Info().Msg("query doesn't include valid mid")
+	} else {
+		// parse the body
+		body := struct{ Name string }{}
+
+		if err := c.BodyParser(&body); err != nil {
+			response.Status = fiber.StatusBadRequest
+
+			logger.Warn().Msg(`body can't be parsed as "struct{ name string }"`)
+		} else {
+			// update the database with the new name
+			dbUpdate("elements", body, struct{ Mid string }{Mid: mid})
+
+			response = getReservations(c)
 		}
 	}
 
@@ -1401,6 +1429,7 @@ func main() {
 			"elements":      patchElements,
 			"users":         patchUsers,
 			"user/password": patchUserPassword,
+			"reservations":  patchReservations,
 		},
 		"DELETE": {
 			"elements":     deleteElements,

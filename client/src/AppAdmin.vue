@@ -10,7 +10,7 @@
 
 <script setup lang="ts">
 	import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-	import { faPlus, faSdCard, faTrashCan, faXmark } from '@fortawesome/free-solid-svg-icons';
+	import { faSdCard, faTrashCan, faXmark } from '@fortawesome/free-solid-svg-icons';
 	import { ref, watch } from 'vue';
 	
 	import BasePV, { get_element_roof, get_element_type, type Element } from './components/BasePV.vue';
@@ -28,7 +28,15 @@ import AdminReservations from './components/AdminReservations.vue';
 
 	watch(user, user => {
 			window_state.value = user?.logged_in ? WindowState.Reservations : WindowState.Login
-	}, { deep: true })
+	}, { deep: true });
+
+	watch(selected_element, () => {
+		if (!!selected_element.value && is_element_available(selected_element.value?.mid)) {
+			console.debug("is free")
+
+			selected_element.value = undefined;
+		}
+	});
 
 	async function submit() {
 		// check wether a element is selected
@@ -59,7 +67,7 @@ import AdminReservations from './components/AdminReservations.vue';
 		if (selected_element.value !== undefined) {
 			const element_name = selected_element.value?.mid.match(/\w?\d+/)?.["0"].toUpperCase()
 			
-			if (confirm(`Reservierung für ${get_element_type(selected_element.value.mid)} ${element_name} mit dem Namen "${get_element(selected_element.value.mid)?.name}" löschen?`)) {
+			if (confirm(`Patenschaft für ${get_element_type(selected_element.value.mid)} ${element_name} mit dem Namen "${get_element(selected_element.value.mid)?.name}" löschen?`)) {
 				const response = await api_call<ElementsDB>("DELETE", "elements", { mid: selected_element.value.mid });
 				
 				if (response.ok) {
@@ -75,8 +83,8 @@ import AdminReservations from './components/AdminReservations.vue';
 <template>
 	<AppLayout>
 		<template #header>
-			<a class="navbar-item" :class="{ active: window_state === WindowState.Elements }" @click="window_state = WindowState.Elements">Elemente</a>
 			<a class="navbar-item" :class="{ active: window_state === WindowState.Reservations }" @click="window_state = WindowState.Reservations">Reservierungen</a>
+			<a class="navbar-item" :class="{ active: window_state === WindowState.Elements }" @click="window_state = WindowState.Elements">Elemente</a>
 			<a class="navbar-item" :class="{ active: window_state === WindowState.Account }" @click="window_state = WindowState.Account">Account</a>
 			<a v-if="user?.name === 'admin'" class="navbar-item" :class="{ active: window_state === WindowState.Users }" @click="window_state = WindowState.Users">Benutzer</a>
 		</template>
@@ -93,15 +101,17 @@ import AdminReservations from './components/AdminReservations.vue';
 			</template>
 			<div
 				v-if="selected_element"
-				id="tooltip_content"
+				id="tooltip-content"
 			>
-				<BaseButton
-					v-if=" selected_element.name === undefined"
-					@click="selected_element.name = ''"
+				<div
+					v-if="selected_element.reserved"
 				>
-					<FontAwesomeIcon :icon="faPlus"></FontAwesomeIcon> {{ get_element_type(selected_element.mid) }} {{ selected_element.mid.match(/\w?\d+/)?.[0].toUpperCase() }} reservieren
-				</BaseButton>
-				<template v-else>
+					Modul ist reserviert.<br>
+					<a @click="window_state = WindowState.Reservations">
+						Zu Reservierungen springen
+					</a>
+				</div>
+				<template v-else-if="!is_element_available(selected_element.mid)">
 					<BaseButton @click="submit">
 						<FontAwesomeIcon :icon="faSdCard" />
 					</BaseButton>
@@ -138,7 +148,7 @@ import AdminReservations from './components/AdminReservations.vue';
 		font-weight: bold;
 	}
 
-	#tooltip_content {
+	#tooltip-content {
 		display: flex;
 		
 		align-items: center;
@@ -155,5 +165,10 @@ import AdminReservations from './components/AdminReservations.vue';
 	#input-name:disabled {
 		cursor: not-allowed;
 		opacity: 50%;
+	}
+
+	#tooltip-content a {
+		text-decoration: underline;
+		font-style: italic;
 	}
 </style>

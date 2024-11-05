@@ -62,7 +62,7 @@
 </script>
 
 <script setup lang="ts">
-	import { onBeforeMount, onMounted, onUnmounted, ref } from 'vue';
+	import { onBeforeMount, onMounted, onUnmounted, ref, watch } from 'vue';
 	
 	import BaseTooltip from './BaseTooltip.vue';
 	import { is_element_available, get_element } from '@/lib';
@@ -145,7 +145,7 @@
 
 		if (target) {
 			// clear the previous selected element
-			svg_selected_element.value?.classList.remove("selected");
+			clear_svg_selected();
 
 			svg_selected_element.value = target as SVGRectElement;
 			const mid = svg_selected_element.value?.id;
@@ -155,6 +155,18 @@
 			svg_selected_element.value.classList.add("selected");
 		}
 	}
+
+	function clear_svg_selected() {
+		svg_selected_element.value?.classList.remove("selected");
+	}
+
+	watch(selected_element, () => {
+		console.debug("here")
+
+		if (selected_element.value === undefined) {
+			clear_svg_selected();
+		}
+	});
 </script>
 
 <template>

@@ -9,6 +9,7 @@ Source-code for the fundraising-website of our photovoltaic-system
 - implement proper donation link
 - move to login-screen after password reset
 - create mail-template-file
+- admin-panel: view with taken elements ("Patenschaften")
 
 # reservations
 
