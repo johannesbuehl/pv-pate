@@ -689,7 +689,7 @@ func (data ReservationData) sendReservationEmail() error {
 	email.AddAlternative(mail.TextHTML, bodyBuffer.String())
 
 	if mailClient, err := mailServer.Connect(); err != nil {
-		logger.Fatal().Msgf("can't connecto to mail-server: %v", err)
+		logger.Fatal().Msgf("can't connect to to mail-server: %v", err)
 
 		return err
 	} else if err := email.Send(mailClient); err != nil {
@@ -975,14 +975,40 @@ func postReservations(c *fiber.Ctx) responseMessage {
 
 		logger.Info().Msg("query doesn't include valid mid")
 	} else {
-		if err := dbUpdate("elements", struct{ Reservation *string }{Reservation: nil}, struct{ Mid string }{Mid: mid}); err != nil {
+		// retrieve the reservation from the database
+		if res, err := dbSelect[ElementDB]("elements", "mid = ?", mid); err != nil {
 			response.Status = fiber.StatusInternalServerError
 
-			logger.Error().Msgf("can't write reservation-confirm to database for %q: %v", mid, err)
+			logger.Error().Msgf("can't get reservation for %q from database: %v", mid, err)
 		} else {
-			dbCache.Delete("elements")
+			certData := CertificateData{
+				Element: mid,
+				Name:    res[0].Name,
+			}
 
-			response = getReservations(c)
+			defer certData.cleanup()
+
+			if err := certData.create(); err != nil {
+				response.Status = fiber.StatusInternalServerError
+				response.Message = "can't create certificate"
+
+				logger.Error().Msgf("can't create certificate for %q: %v", mid, err)
+			} else if err := certData.send(); err != nil {
+				response.Status = fiber.StatusInternalServerError
+				response.Message = "can't send certificate"
+
+				logger.Error().Msgf("can't send certificate for %q: %v", mid, err)
+			} else {
+				if err := dbUpdate("elements", struct{ Reservation *string }{Reservation: nil}, struct{ Mid string }{Mid: mid}); err != nil {
+					response.Status = fiber.StatusInternalServerError
+
+					logger.Error().Msgf("can't write reservation-confirm to database for %q: %v", mid, err)
+				} else {
+					dbCache.Delete("elements")
+				}
+
+				response = getReservations(c)
+			}
 		}
 	}
 

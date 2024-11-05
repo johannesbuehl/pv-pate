@@ -6,7 +6,7 @@ Source-code for the fundraising-website of our photovoltaic-system
 - move list of valid mids and regex out of source-code
 - implement proper donation link
 - create mail-template-file
-
-# reservations
-## admin-panel
-- list of reserved modules: confirm or deny -> create and send pdf on confirm
+- add certificate recreation for already taken elements -> download instead of mail this time
+- add second certificate for empty names
+- improve certificate-email test and header
+- certificate: use better formatted names
