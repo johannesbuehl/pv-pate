@@ -140,8 +140,7 @@ import { elements_db, type ElementsDB } from './Globals';
 				</tbody>
 			</table>
 		</div>
-		{{ elements_db }}
-		<BasePV
+		<BasePV	
 			v-model:selected_element="selected_element"
 		>
 			<template #header

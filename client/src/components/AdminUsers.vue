@@ -100,7 +100,7 @@
 		<div id="modify-user-wrapper">
 			<table id="users">
 				<thead>
-					<tr class="header">
+					<tr>
 						<th>UID</th>
 						<th>Name</th>
 						<th>Passwort</th>
@@ -109,7 +109,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr class="content" v-for="user of users" :key="user.uid">
+					<tr v-for="user of users" :key="user.uid">
 						<th>{{ user.uid }}</th>
 						<th>{{ user.name }}</th>
 						<th>
@@ -169,23 +169,25 @@
 		max-width: 40em;
 	}
 
-	tr.header * {
-		font-weight: bolder;
+	thead th {
+		font-weight: bold;
 
 		background-color: black;
 		color: white;
 	}
 
-	tr.content:nth-of-type(2n) {
+	tbody > tr:nth-of-type(2n) {
 		background-color: hsl(0, 0%, 90%);
 	}
 
-	tr.content:nth-of-type(2n + 1) {
+	tbody > tr:nth-of-type(2n + 1) {
 		background-color: hsl(0, 0%, 80%);
 	}
 
 	th {
 		padding: 0.25em;
+
+		font-weight: normal;
 	}
 
 	th > div.cell {
@@ -200,7 +202,7 @@
 		flex: 1;
 	}
 
-	tr.content input[type="text"] {
+	tbody > tr input[type="text"] {
 		font-size: 0.67em;
 	}
 </style>

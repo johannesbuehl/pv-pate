@@ -330,14 +330,21 @@ func checkAdmin(c *fiber.Ctx) (bool, error) {
 }
 
 // information about an element in the database
-type ElementDBNoReservation struct {
-	Mid  string `json:"mid"`
-	Name string `json:"name"`
-}
 type ElementDB struct {
 	Mid         string  `json:"mid"`
 	Name        string  `json:"name"`
 	Reservation *string `json:"reservation"`
+}
+
+type ElementDBNoReservation struct {
+	Mid  string `json:"mid"`
+	Name string `json:"name"`
+}
+
+type ElementDBReservationString struct {
+	Mid         string `json:"mid"`
+	Name        string `json:"name"`
+	Reservation string `json:"reservation"`
 }
 
 // client-data of the reserved elements
@@ -841,6 +848,31 @@ func getUsers(c *fiber.Ctx) responseMessage {
 	return response
 }
 
+func getReservations(c *fiber.Ctx) responseMessage {
+	var response responseMessage
+
+	if ok, err := checkUser(c); err != nil {
+		response.Status = fiber.StatusInternalServerError
+
+		logger.Error().Msgf("can't check for user: %v", err)
+	} else if !ok {
+		response.Status = fiber.StatusUnauthorized
+
+		logger.Info().Msg("request in not authorized")
+	} else {
+		if res, err := dbSelect[ElementDBReservationString]("elements", "reservation IS NOT NULL"); err != nil {
+			response.Status = fiber.StatusInternalServerError
+
+			logger.Error().Msgf("can't get reserved elements from database: %v", err)
+		} else {
+
+			response.Data = res
+		}
+	}
+
+	return response
+}
+
 // validates a password against the password-rules
 func validatePassword(password string) bool {
 	return len(password) >= 12 && len(password) <= 64
@@ -894,6 +926,42 @@ func postUsers(c *fiber.Ctx) responseMessage {
 
 					logger.Debug().Msgf("added user %q", body.Name)
 				}
+			}
+		}
+	}
+
+	return response
+}
+
+func postReservations(c *fiber.Ctx) responseMessage {
+	var response responseMessage
+
+	if ok, err := checkUser(c); err != nil {
+		response.Status = fiber.StatusInternalServerError
+
+		logger.Error().Msgf("can't check for user: %v", err)
+	} else if !ok {
+		response.Status = fiber.StatusUnauthorized
+
+		// check if mid is in query
+	} else if mid := c.Query("mid"); mid == "" {
+		response.Status = fiber.StatusBadRequest
+		response.Message = "query doesn't include valid mid"
+
+		logger.Info().Msg("query doesn't include valid mid")
+	} else {
+		switch c.Query("q") {
+		default:
+			response.Status = fiber.StatusBadRequest
+
+		// confirm the reservation
+		case "confirm":
+			if err := dbUpdate("elements", struct{ Reservation *string }{Reservation: nil}, struct{ Mid string }{Mid: mid}); err != nil {
+				response.Status = fiber.StatusInternalServerError
+
+				logger.Error().Msgf("can't write reservation-confirm to database for %q: %v", mid, err)
+			} else {
+				response = getReservations(c)
 			}
 		}
 	}
@@ -1018,6 +1086,37 @@ func deleteUsers(c *fiber.Ctx) responseMessage {
 			logger.Debug().Msgf("deleted user with uid = %q", uid)
 
 			response = getUsers(c)
+		}
+	}
+
+	return response
+}
+
+func deleteReservations(c *fiber.Ctx) responseMessage {
+	var response responseMessage
+
+	if ok, err := checkUser(c); err != nil {
+		response.Status = fiber.StatusInternalServerError
+
+		logger.Error().Msgf("can't check for user: %v", err)
+	} else if !ok {
+		response.Status = fiber.StatusUnauthorized
+
+		// check for mid in query
+	} else if mid := c.Query("mid"); mid == "" {
+		response.Status = fiber.StatusBadRequest
+		response.Message = "query doesn't include valid mid"
+
+		logger.Info().Msg("query doesn't include valid mid")
+	} else {
+		if err := dbDelete("elements", struct{ Mid string }{Mid: mid}); err != nil {
+			response.Status = fiber.StatusInternalServerError
+
+			logger.Error().Msgf("error while removing reservation for element %q from database: %v", mid, err)
+		} else {
+			dbCache.Delete("elements")
+
+			response = getReservations(c)
 		}
 	}
 
@@ -1289,12 +1388,14 @@ func main() {
 	// map with the individual registered endpoints
 	endpoints := map[string]map[string]func(*fiber.Ctx) responseMessage{
 		"GET": {
-			"elements": getElements,
-			"users":    getUsers,
+			"elements":     getElements,
+			"users":        getUsers,
+			"reservations": getReservations,
 		},
 		"POST": {
-			"elements": postElements,
-			"users":    postUsers,
+			"elements":     postElements,
+			"users":        postUsers,
+			"reservations": postReservations,
 		},
 		"PATCH": {
 			"elements":      patchElements,
@@ -1302,8 +1403,9 @@ func main() {
 			"user/password": patchUserPassword,
 		},
 		"DELETE": {
-			"elements": deleteElements,
-			"users":    deleteUsers,
+			"elements":     deleteElements,
+			"users":        deleteUsers,
+			"reservations": deleteReservations,
 		},
 	}
 

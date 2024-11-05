@@ -119,7 +119,7 @@ export function is_element_available(mid: string): boolean {
 	return elements_db.value.taken[mid] === undefined && !elements_db.value.reserved.includes(mid);
 }
 
-export function get_element(mid: string): Element | undefined {
+export function get_element(mid: string): Element {
 	if (elements_db.value.taken[mid] !== undefined) {
 		return {
 			mid,
@@ -134,5 +134,7 @@ export function get_element(mid: string): Element | undefined {
 		}
 	}
 
-	return undefined;
+	return {
+		mid
+	};
 }

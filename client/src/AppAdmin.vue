@@ -2,6 +2,7 @@
 	enum WindowState {
 		Login,
 		Elements,
+		Reservations,
 		Account,
 		Users
 	}
@@ -20,6 +21,7 @@
 	import AdminLogin from './components/AdminLogin.vue';
 	import AdminAccount from './components/AdminAccount.vue';
 	import AppLayout from './components/AppLayout/AppLayout.vue';
+import AdminReservations from './components/AdminReservations.vue';
 
 	const window_state = ref<WindowState>(WindowState.Login);
 	const selected_element = ref<Element>();
@@ -74,6 +76,7 @@
 	<AppLayout>
 		<template #header>
 			<a class="navbar-item" :class="{ active: window_state === WindowState.Elements }" @click="window_state = WindowState.Elements">Elemente</a>
+			<a class="navbar-item" :class="{ active: window_state === WindowState.Reservations }" @click="window_state = WindowState.Reservations">Reservierungen</a>
 			<a class="navbar-item" :class="{ active: window_state === WindowState.Account }" @click="window_state = WindowState.Account">Account</a>
 			<a v-if="user?.name === 'admin'" class="navbar-item" :class="{ active: window_state === WindowState.Users }" @click="window_state = WindowState.Users">Benutzer</a>
 		</template>
@@ -117,6 +120,7 @@
 				</template>
 			</div>
 		</BasePV>
+		<AdminReservations v-else-if="window_state === WindowState.Reservations" />
 		<AdminAccount v-else-if="window_state === WindowState.Account" />
 		<AdminUsers v-else-if="window_state === WindowState.Users" />
 	</AppLayout>

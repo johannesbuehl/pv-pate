@@ -20,20 +20,44 @@
 
 	const row_roof_map = {
 		d: "Kirchendach",
-		r: "Gemeindehaus",
-		v: "Pfarrhaus"
+		l: "Westdach",
+		r: "Ostdach",
+		v: "Süddach"
+	}
+
+	export function get_element_string(mid: string): string {
+		// handle batteries extra
+		if (mid.slice(0, 2) === "bs") {
+			return `${get_element_type(mid)} ${mid.slice(3).toUpperCase()}`;
+		} else {	
+			const mid_row = mid.slice(3, 4);
+			
+			for (let [row, roof] of Object.entries(row_roof_map)) {
+				if (mid_row <= row) {
+					return `${get_element_type(mid)} ${mid.slice(3).toUpperCase()}`;
+				}
+			}
+			
+			return mid_row;
+		}
 	}
 
 	export function get_element_roof(mid: string): string {
-		const mid_row = mid.slice(3, 4);
+		let return_string = get_element_string(mid);
 
-		for (let [row, roof] of Object.entries(row_roof_map)) {
-			if (mid_row <= row) {
-				return `${get_element_type(mid)} ${mid.slice(3).toUpperCase()} (${roof})`;
+		// add the roof for pv-modules
+		if (mid.slice(0, 2) === "pv") {
+			const mid_row = mid.slice(3, 4);
+			
+			for (let [row, roof] of Object.entries(row_roof_map)) {
+				if (mid_row <= row) {
+					return_string += ` ${roof}`
+
+					break;
+				}
 			}
 		}
-
-		return mid_row;
+		return return_string;
 	}
 </script>
 
