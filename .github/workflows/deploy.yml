@@ -17,7 +17,7 @@ jobs:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USERNAME }}
           key: ${{ secrets.DEPLOY_KEY }}
-          script: cd pv-spende && make
+          script: cd pv-spenden && make
       - name: restart the backend
         uses: appleboy/ssh-action@v1.1.0
         with:
