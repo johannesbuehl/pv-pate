@@ -60,49 +60,57 @@ import BaseButton from './BaseButton.vue';
 <template>
 	<h1>Patenschaften</h1>
 
-	<table>
-		<thead>
-			<tr>
-				<th>Element</th>
-				<th>Name</th>
-				<th>Zertifikat</th>
-				<th>Löschen</th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr
-				v-for="sponsorship of sponsorships"
-				:key="sponsorship.mid"
-			>
-				<th>{{ get_element_string(sponsorship.mid) }}</th>
-				<th class="name-cell">
-					<input type="text" v-model="sponsorship.new_name" @keydown.enter="update_sponsorship(sponsorship)" />
-					<BaseButton
-						:disabled="sponsorship.name === sponsorship.new_name"
-						@click="update_sponsorship(sponsorship)"
-					>
-						<FontAwesomeIcon :icon="faSdCard" />
-					</BaseButton>
-				</th>
-				<th>
-					<form
-						action="/pv/api/certificates"
-						target="_blank"
-					>
-						<input type="text" name="mid" style="display: none;" :value="sponsorship.mid" />
-						<input type="submit" :id="`get-certificate-submit-${sponsorship.mid}`" style="display: none;" />
-						<label :for="`get-certificate-submit-${sponsorship.mid}`">
-							<BaseButton @click="get_certificate(sponsorship.mid)"><FontAwesomeIcon :icon="faDownload" /></BaseButton>
-						</label>
-					</form>
-				</th>
-				<th><BaseButton @click="delete_sponsorship(sponsorship.mid)"><FontAwesomeIcon :icon="faTrash" /></BaseButton></th>
-			</tr>
-		</tbody>
-	</table>
+	<div id="table-wrapper">
+		<table>
+			<thead>
+				<tr>
+					<th>Element</th>
+					<th>Name</th>
+					<th>Zertifikat</th>
+					<th>Löschen</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr
+					v-for="sponsorship of sponsorships"
+					:key="sponsorship.mid"
+				>
+					<th>{{ get_element_string(sponsorship.mid) }}</th>
+					<th class="name-cell">
+						<input type="text" name="name" v-model="sponsorship.new_name" @keydown.enter="update_sponsorship(sponsorship)" autocomplete="off"/>
+						<BaseButton
+							:disabled="sponsorship.name === sponsorship.new_name"
+							:square="true"
+							@click="update_sponsorship(sponsorship)"
+						>
+							<FontAwesomeIcon :icon="faSdCard" />
+						</BaseButton>
+					</th>
+					<th class="center">
+						<form
+							action="/pv/api/certificates"
+							target="_blank"
+						>
+							<input type="text" name="mid" style="display: none;" :value="sponsorship.mid" />
+							<input type="submit" :id="`get-certificate-submit-${sponsorship.mid}`" style="display: none;" />
+							<label :for="`get-certificate-submit-${sponsorship.mid}`">
+								<BaseButton class="center" @click="get_certificate(sponsorship.mid)" :square="true"><FontAwesomeIcon :icon="faDownload" /></BaseButton>
+							</label>
+						</form>
+					</th>
+					<th><BaseButton class="center" @click="delete_sponsorship(sponsorship.mid)" :square="true"><FontAwesomeIcon :icon="faTrash" /></BaseButton></th>
+				</tr>
+			</tbody>
+		</table>
+	</div>
 </template>
 
 <style scoped>
+	#table-wrapper {
+		max-width: 100%;
+		overflow-x: auto;
+	}
+
 	thead th {
 		font-weight: bold;
 
@@ -129,5 +137,9 @@ import BaseButton from './BaseButton.vue';
 		align-items: center;
 
 		gap: 0.25em;
+	}
+
+	.center {
+		margin-inline: auto;
 	}
 </style>

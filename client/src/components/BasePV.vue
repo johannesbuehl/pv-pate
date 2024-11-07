@@ -20,8 +20,8 @@
 
 	const row_roof_map = {
 		d: "Kirchendach",
-		l: "Westdach",
-		r: "Ostdach",
+		l: "Ostdach",
+		r: "Westdach",
 		v: "Süddach"
 	}
 
@@ -51,7 +51,7 @@
 			
 			for (let [row, roof] of Object.entries(row_roof_map)) {
 				if (mid_row <= row) {
-					return_string += ` ${roof}`
+					return_string += ` (${roof})`
 
 					break;
 				}
@@ -86,8 +86,6 @@
 	});
 
 	function hide_tooltip() {
-		svg_selected_element.value?.classList.remove("selected");
-
 		svg_selected_element.value = undefined;
 		selected_element.value = undefined;
 	}
@@ -102,10 +100,6 @@
 		svg_dom.id = "main-content";
 
 		const prepare_element = (ele: SVGPathElement, classname: string) => {
-			ele.querySelectorAll<SVGSetElement>(".fill").forEach((e) => e.style.removeProperty("fill"));
-
-			ele.style.removeProperty("fill");
-
 			ele.classList.add("element");
 
 			ele.classList.add(classname);
@@ -118,10 +112,6 @@
 		// select all elements
 		const elements: SVGPathElement[] = Array.from(svg_dom.querySelectorAll<SVGPathElement>("[id^='pv-']"));
 		elements.forEach(element => prepare_element(element, "module"));
-
-		// select all inverters
-		const inverters: SVGPathElement[] = Array.from(svg_dom.querySelectorAll<SVGPathElement>("[id^='wr-']"))
-		inverters.forEach(element => prepare_element(element, "inverter"));
 
 		// select all batteries
 		const batteries: SVGPathElement[] = Array.from(svg_dom.querySelectorAll<SVGPathElement>("[id^='bs-']"))
@@ -145,28 +135,12 @@
 
 		if (target) {
 			// clear the previous selected element
-			clear_svg_selected();
-
 			svg_selected_element.value = target as SVGRectElement;
 			const mid = svg_selected_element.value?.id;
 
 			selected_element.value = get_element(mid);
-
-			svg_selected_element.value.classList.add("selected");
 		}
 	}
-
-	function clear_svg_selected() {
-		svg_selected_element.value?.classList.remove("selected");
-	}
-
-	watch(selected_element, () => {
-		console.debug("here")
-
-		if (selected_element.value === undefined) {
-			clear_svg_selected();
-		}
-	});
 </script>
 
 <template>
@@ -188,6 +162,7 @@
 			@click="hide_tooltip"
 		>
 			<BaseTooltip
+				id="tooltip"
 				@close="hide_tooltip"
 			>
 				<template #header>
@@ -227,6 +202,10 @@
 		justify-content: center;
 	}
 
+	#tooltip {
+		max-width: 25em;
+	}
+
 	.v-enter-active,
 	.v-leave-active {
 		transition: filter 0.2s;
@@ -257,102 +236,40 @@
 	svg#main-content .fill {
 		cursor: pointer;
 		
-		transition: fill 0.2s;
+		transition: filter 0.1s;
 	}
 
 	/* module */
-	svg#main-content .module .fill,
-	svg#main-content .module.fill {
-		fill: var(--color-module);
-	}
-
 	svg#main-content .module:hover .fill,
 	svg#main-content .module:hover.fill {
-		fill: var(--color-module-hover);
-	}
-
-	svg#main-content .module.selected .fill,
-	svg#main-content .module.selected.fill {
-		fill: var(--color-module-selected);
+		filter: var(--filter-module-hover);
 	}
 
 	/* element - sold */
 	svg#main-content .module.sold .fill,
 	svg#main-content .module.sold.fill {
-		fill: var(--color-module-sold);
+		filter: var(--filter-module-sold);
 	}
 
 	svg#main-content .module.sold:hover .fill,
 	svg#main-content .module.sold:hover.fill {
-		fill: var(--color-module-sold-hover);
-	}
-
-	svg#main-content .module.sold.selected .fill,
-	svg#main-content .module.sold.selected.fill {
-		fill: var(--color-module-sold-selected);
-	}
-
-	/* inverter */
-	svg#main-content .inverter .fill,
-	svg#main-content .inverter.fill {
-		fill: var(--color-inverter);
-	}
-
-	svg#main-content .inverter:hover .fill,
-	svg#main-content .inverter:hover.fill {
-		fill: var(--color-inverter-hover);
-	}
-
-	svg#main-content .inverter.selected .fill,
-	svg#main-content .inverter.selected.fill {
-		fill: var(--color-inverter-selected);
-	}
-
-	/* inverter - sold */
-	svg#main-content .inverter.sold .fill,
-	svg#main-content .inverter.sold.fill {
-		fill: var(--color-inverter-sold);
-	}
-
-	svg#main-content .inverter.sold:hover .fill,
-	svg#main-content .inverter.sold:hover.fill {
-		fill: var(--color-inverter-sold-hover);
-	}
-
-	svg#main-content .inverter.sold.selected .fill,
-	svg#main-content .inverter.sold.selected.fill {
-		fill: var(--color-inverter-sold-selected);
+		filter: var(--filter-module-sold-hover);
 	}
 
 	/* battery */	
-	svg#main-content .battery .fill,
-	svg#main-content .battery.fill {
-		fill: var(--color-battery);
-	}
-
 	svg#main-content .battery:hover .fill,
 	svg#main-content .battery:hover.fill {
-		fill: var(--color-battery-hover);
-	}
-
-	svg#main-content .battery.selected .fill,
-	svg#main-content .battery.selected.fill {
-		fill: var(--color-battery-selected);
+		filter: var(--filter-battery-hover);
 	}
 
 	/* battery - sold */
 	svg#main-content .battery.sold .fill,
 	svg#main-content .battery.sold.fill {
-		fill: var(--color-battery-sold);
+		filter: var(--filter-battery-sold);
 	}
 	
 	svg#main-content .battery.sold:hover .fill,
 	svg#main-content .battery.sold:hover.fill {
-		fill: var(--color-battery-sold-hover);
-	}
-
-	svg#main-content .battery.sold.selected .fill,
-	svg#main-content .battery.sold.selected.fill {
-		fill: var(--color-battery-soldselected);
+		filter: var(--filter-battery-sold-hover);
 	}
 </style>

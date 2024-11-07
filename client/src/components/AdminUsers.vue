@@ -90,10 +90,10 @@
 		<h1>Benutzer</h1>
 		<div id="add-user-wrapper">
 			<div id="add-user-wrapper-inputs">
-				Benutzername: <input type="text" v-model="add_user_name_input" placeholder="username" />
-				Passwort: <input type="text" v-model="add_user_password_input" placeholder="password" />
+				Benutzername: <input type="text" name="username" autocomplete="off" v-model="add_user_name_input" placeholder="username" />
+				Passwort: <input type="text" name="password" v-model="add_user_password_input" placeholder="password" />
 			</div>
-			<BaseButton :disabled="!validate_new_user()" @click="add_user">
+			<BaseButton :disabled="!validate_new_user()" :square="true" @click="add_user">
 				<FontAwesomeIcon :icon="faPlus" />
 			</BaseButton>
 		</div>
@@ -114,12 +114,12 @@
 						<th>{{ user.name }}</th>
 						<th>
 							<div class="cell">
-								<input type="text" v-model="user.password" placeholder="Neues Passwort" />
+								<input type="text" name="new-password" v-model="user.password" placeholder="Neues Passwort" />
 							</div>
 						</th>
 						<th>
 							<div class="cell">
-								<BaseButton class="button" :disabled="!validate_password(user.password)" @click="modify_user(user)"
+								<BaseButton class="button" :disabled="!validate_password(user.password)" :square="true" @click="modify_user(user)"
 									><FontAwesomeIcon :icon="faSdCard"
 								/></BaseButton>
 							</div>
@@ -129,6 +129,7 @@
 								<BaseButton
 									class="button"
 									:disabled="user.name === 'admin'"
+									:square="true" 
 									@click="delete_user(user)"
 									><FontAwesomeIcon :icon="faTrash"
 								/></BaseButton>
@@ -148,6 +149,10 @@
 
 		align-items: center;
 		gap: 0.5em;
+
+		margin: 0.5em;
+
+		max-width: 100%;
 	}
 
 	#add-user-wrapper {
@@ -157,6 +162,8 @@
 		gap: 1em;
 	}
 
+
+
 	#add-user-wrapper-inputs {
 		display: grid;
 
@@ -164,9 +171,21 @@
 
 		column-gap: 0.5em;
 	}
+
+	@media screen and (max-width: 600px) {
+		#add-user-wrapper-inputs {
+			display: flex;
+			flex-direction: column;
+		}
+	}
 	
 	#users {
 		max-width: 40em;
+	}
+
+	#modify-user-wrapper {
+		max-width: 100%;
+		overflow-x: auto;
 	}
 
 	thead th {

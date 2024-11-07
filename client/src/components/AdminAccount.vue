@@ -58,13 +58,13 @@
 		<h1>Account</h1>
 		<div id=change-password>
 			<form id="change-password-inputs">
-				<input style="display: none;" type="text" autocomplete="username">
+				<input style="display: none;" type="text" name="username" autocomplete="username">
 				Bisheriges Passwort
-				<input type="password" autocomplete="current-password" v-model="password_current">
+				<input type="password" name="current-password" autocomplete="current-password" v-model="password_current">
 				Neues Passwort
-				<input type="password" autocomplete="new-password" v-model="password_new">
+				<input type="password" name="new-password" autocomplete="new-password" v-model="password_new">
 				Neues Passwort wiederholen
-				<input type="password" autocomplete="new-password" v-model="password_repeat">
+				<input type="password" name="new-password-confirm" autocomplete="new-password" v-model="password_repeat">
 			</form>
 			<div
 				v-if="validate_password(password_new, password_repeat, password_current).length > 0"
@@ -87,6 +87,8 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
+
+		margin: 0.5em;
 	}
 
 	#change-password {
@@ -104,6 +106,13 @@
 		grid-template-columns: auto auto;
 
 		column-gap: 0.5em;
+	}
+
+	@media screen and (max-width: 600px) {
+		#change-password-inputs {
+			display: flex;
+			flex-direction: column
+		}
 	}
 
 	#password-error-text {

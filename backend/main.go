@@ -926,7 +926,8 @@ func getCertificates(c *fiber.Ctx) responseMessage {
 		} else {
 			// create the pdf
 			certData := CertificateData{
-				Element: mid,
+				Mid:     mid,
+				Element: getElementType(mid),
 				Name:    res[0].Name,
 			}
 
@@ -937,6 +938,7 @@ func getCertificates(c *fiber.Ctx) responseMessage {
 			} else {
 				defer certData.cleanup()
 
+				c.Attachment(certData.PDFFile)
 				c.SendFile(certData.PDFFile)
 			}
 		}
@@ -1022,41 +1024,15 @@ func postReservations(c *fiber.Ctx) responseMessage {
 
 		logger.Info().Msg("query doesn't include valid mid")
 	} else {
-		// retrieve the reservation from the database
-		if res, err := dbSelect[ElementDB]("elements", "mid = ?", mid); err != nil {
+		if err := dbUpdate("elements", struct{ Reservation *string }{Reservation: nil}, struct{ Mid string }{Mid: mid}); err != nil {
 			response.Status = fiber.StatusInternalServerError
 
-			logger.Error().Msgf("can't get reservation for %q from database: %v", mid, err)
+			logger.Error().Msgf("can't write reservation-confirm to database for %q: %v", mid, err)
 		} else {
-			certData := CertificateData{
-				Element: mid,
-				Name:    res[0].Name,
-			}
-
-			defer certData.cleanup()
-
-			if err := certData.create(); err != nil {
-				response.Status = fiber.StatusInternalServerError
-				response.Message = "can't create certificate"
-
-				logger.Error().Msgf("can't create certificate for %q: %v", mid, err)
-			} else if err := certData.send(); err != nil {
-				response.Status = fiber.StatusInternalServerError
-				response.Message = "can't send certificate"
-
-				logger.Error().Msgf("can't send certificate for %q: %v", mid, err)
-			} else {
-				if err := dbUpdate("elements", struct{ Reservation *string }{Reservation: nil}, struct{ Mid string }{Mid: mid}); err != nil {
-					response.Status = fiber.StatusInternalServerError
-
-					logger.Error().Msgf("can't write reservation-confirm to database for %q: %v", mid, err)
-				} else {
-					dbCache.Delete("elements")
-				}
-
-				response = getReservations(c)
-			}
+			dbCache.Delete("elements")
 		}
+
+		response = getReservations(c)
 	}
 
 	return response

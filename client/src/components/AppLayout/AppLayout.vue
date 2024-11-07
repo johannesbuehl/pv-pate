@@ -34,12 +34,12 @@
 <template>
 	<LayoutHeaderFooter v-if="user?.logged_in || !is_home('/')" id="header">
 		<template #left>
-			<BaseButton id="hamburger-toggle" :class="{ active: hamburger_menu }" @click="hamburger_menu = !hamburger_menu"><FontAwesomeIcon :icon="faBars" /></BaseButton>
+			<BaseButton id="hamburger-toggle" :class="{ active: hamburger_menu }" :square="true" @click="hamburger_menu = !hamburger_menu"><FontAwesomeIcon id="hamburger-icon" :icon="faBars" /></BaseButton>
 		</template>
-
 		<div
 			id="header-content"
 			:class="{ visible: hamburger_menu }"
+			@click="hamburger_menu = false"
 		>
 			<a v-if="!is_home('/') && user?.logged_in" href="/">Home</a>
 			
@@ -51,7 +51,6 @@
 				<slot name="header"></slot>
 			</template>
 		</div>
-
 		<template #right
 			v-if="user?.logged_in"
 		>
@@ -74,11 +73,13 @@
 <style scoped>
 	#hamburger-toggle {
 		display: none;
-
+	}
+	
+	#hamburger-icon {
 		transition: transform 0.5s ease;
 	}
 
-	#hamburger-toggle.active {
+	#hamburger-toggle.active > #hamburger-icon {
 		transform: rotate(90deg);
 	}
 
@@ -101,7 +102,7 @@
 		}
 
 		#hamburger-toggle {
-			display: unset;
+			display: flex;
 		}
 	}
 
@@ -129,9 +130,6 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 0.5em;
-
-		padding: 0.5em;
 
 		min-height: 100cqh;
 	}

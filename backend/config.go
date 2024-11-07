@@ -213,7 +213,7 @@ func init() {
 
 	// create the logfile output
 	outputLog := &lumberjack.Logger{
-		Filename:  "logs/livestreamScheduler.log",
+		Filename:  "logs/backend.log",
 		MaxAge:    7,
 		LocalTime: true,
 	}

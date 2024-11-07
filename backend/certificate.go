@@ -5,11 +5,10 @@ import (
 	"os"
 	"os/exec"
 	"text/template"
-
-	mail "github.com/xhit/go-simple-mail/v2"
 )
 
 type CertificateData struct {
+	Mid     string
 	Element string
 	Name    string
 	PDFFile string
@@ -31,7 +30,7 @@ func (data *CertificateData) create() error {
 				defer os.Remove(svgFile.Name())
 				defer svgFile.Close()
 
-				data.PDFFile = fmt.Sprintf("certificates/certificate.%s.pdf", data.Element)
+				data.PDFFile = fmt.Sprintf("certificates/certificate.%s.pdf", data.Mid)
 
 				// write the svg-template
 				svgTemplate.Execute(svgFile, data)
@@ -40,6 +39,8 @@ func (data *CertificateData) create() error {
 
 				// create a pdf from the svg-file
 				command := exec.Command("certificates/inkscape/AppRun", actionString, svgFile.Name())
+				command.Stderr = os.Stderr
+				command.Stdout = os.Stdout
 
 				if err := command.Run(); err != nil {
 					logger.Error().Msg(err.Error())
@@ -50,25 +51,6 @@ func (data *CertificateData) create() error {
 				return nil
 			}
 		}
-	}
-}
-
-func (data CertificateData) send() error {
-	email := mail.NewMSG()
-
-	email.SetFrom(fmt.Sprintf("Klimaplus-Patenschaft <%s>", config.Mail.User)).AddTo(config.Mail.User).SetSubject(data.Element)
-
-	email.SetBody(mail.TextPlain, fmt.Sprintf("Patenschafts-Zertifikat für Element %s", data.Element))
-	email.Attach(&mail.File{FilePath: data.PDFFile})
-
-	if mailClient, err := mailServer.Connect(); err != nil {
-		logger.Fatal().Msgf("can't connect to to mail-server: %v", err)
-
-		return err
-	} else if err := email.Send(mailClient); err != nil {
-		return err
-	} else {
-		return nil
 	}
 }
 

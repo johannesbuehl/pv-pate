@@ -4,5 +4,4 @@ backend
 
 logs
 config.yaml
-certificates/inkscape
-certificates/inkscape.AppImage
+certificates

@@ -54,11 +54,6 @@
 </template>
 
 <style scoped>
-	#main-view {
-		width: 100%;
-		height: 100%;
-	}
-
 	.navbar-item.active {
 		text-decoration: underline;
 

@@ -9,13 +9,14 @@
 
 <script setup lang="ts">
 	import { api_call } from '@/lib';
-import { faEuro, faSdCard, faTrash } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { onMounted, ref, watch } from 'vue';
-import BaseButton from './BaseButton.vue';
-import { get_element_roof, get_element_string } from './BasePV.vue';
+	import { faEuro, faSdCard, faTrash } from '@fortawesome/free-solid-svg-icons';
+	import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+	import { onMounted, ref, watch } from 'vue';
+	import BaseButton from './BaseButton.vue';
+	import { get_element_roof, get_element_string } from './BasePV.vue';
 
 	const reservations = ref<Reservation[]>();
+	const download_ref = ref<HTMLAnchorElement>();
 
 	onMounted(async () => {
 		const response = await api_call<Reservation[]>("GET", "reservations");
@@ -32,10 +33,41 @@ import { get_element_roof, get_element_string } from './BasePV.vue';
 
 	async function confirm_reservation(mid: string) {
 		if (confirm(`Reservierung für ${get_element_roof(mid)} bestätigen?`)) {
-			const response = await api_call<Reservation[]>("POST", "reservations", { mid })
+			const response = await api_call<Reservation[]>("POST", "reservations", { mid });
 
 			if (response.ok) {
 				reservations.value = await response.json();
+
+				const urlsearchparams = new URLSearchParams({ mid });
+
+				// request the certificate
+				const response_cert = await fetch(window.origin + "/pv/api/certificates?" + urlsearchparams.toString(), {
+					headers: {
+						// eslint-disable-next-line @typescript-eslint/naming-convention
+						"Content-Type": "application/json; charset=UTF-8"
+					},
+					credentials: "include",
+					method: "GET"
+				});
+
+				if (response_cert.ok) {
+					if (download_ref.value !== undefined) {
+						// set the file-name
+						const header = response_cert.headers.get('Content-Disposition');
+						const parts = header?.split(';');
+						const filename = parts?.[1].split('=')[1]?.replaceAll("\"", "");
+
+						if (filename !== undefined) {
+							download_ref.value.download = filename;
+						}
+
+						const url = window.URL.createObjectURL(await response_cert.blob());
+
+						download_ref.value.href = url;
+						download_ref.value.click();
+						window.URL.revokeObjectURL(url);
+					}
+				}
 			}
 		}
 	}
@@ -67,40 +99,49 @@ import { get_element_roof, get_element_string } from './BasePV.vue';
 <template>
 	<h1>Reservierungen</h1>
 
-	<table>
-		<thead>
-			<tr>
-				<th>Element</th>
-				<th>Name</th>
-				<th>Reservierungsdatum</th>
-				<th>Bestätigen</th>
-				<th>Löschen</th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr
-				v-for="reservation of reservations"
-				:key="reservation.mid"
-			>
-				<th>{{ get_element_string(reservation.mid) }}</th>
-				<th class="name-cell">
-					<input type="text" v-model="reservation.new_name" @keydown.enter="update_reservation(reservation)" />
-					<BaseButton
-						:disabled="reservation.name === reservation.new_name"
-						@click="update_reservation(reservation)"
-					>
-						<FontAwesomeIcon :icon="faSdCard" />
-					</BaseButton>
-				</th>
-				<th>{{ reservation.reservation }}</th>
-				<th><BaseButton @click="confirm_reservation(reservation.mid)"><FontAwesomeIcon :icon="faEuro" /></BaseButton></th>
-				<th><BaseButton @click="delete_reservation(reservation.mid)"><FontAwesomeIcon :icon="faTrash" /></BaseButton></th>
-			</tr>
-		</tbody>
-	</table>
+	<div id="table-wrapper">
+		<table>
+			<thead>
+				<tr>
+					<th>Element</th>
+					<th>Name</th>
+					<th>Reservierungsdatum</th>
+					<th>Bestätigen</th>
+					<th>Löschen</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr
+					v-for="reservation of reservations"
+					:key="reservation.mid"
+				>
+					<th>{{ get_element_string(reservation.mid) }}</th>
+					<th class="name-cell">
+						<input type="text" name="name" v-model="reservation.new_name" @keydown.enter="update_reservation(reservation)" autocomplete="off "/>
+						<BaseButton
+							:disabled="reservation.name === reservation.new_name"
+							:square="true" 
+							@click="update_reservation(reservation)"
+						>
+							<FontAwesomeIcon :icon="faSdCard" />
+						</BaseButton>
+					</th>
+					<th>{{ reservation.reservation }}</th>
+					<th><BaseButton class="center" @click="confirm_reservation(reservation.mid)" :square="true"><FontAwesomeIcon :icon="faEuro" /></BaseButton></th>
+					<th><BaseButton class="center" @click="delete_reservation(reservation.mid)" :square="true"><FontAwesomeIcon :icon="faTrash" /></BaseButton></th>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<a ref="download_ref" style="display: none;" />
 </template>
 
 <style scoped>
+	#table-wrapper {
+		overflow-x: scroll;
+		max-width: 100%;
+	}
+
 	thead th {
 		font-weight: bold;
 
@@ -127,5 +168,9 @@ import { get_element_roof, get_element_string } from './BasePV.vue';
 		align-items: center;
 
 		gap: 0.25em;
+	}
+
+	.center {
+		margin-inline: auto;
 	}
 </style>

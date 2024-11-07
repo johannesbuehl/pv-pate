@@ -13,7 +13,7 @@ import { faXmark } from '@fortawesome/free-solid-svg-icons';
 	>
 		<div id="header">
 			<slot name="header"></slot>
-			<BaseButton id="btn-close" @click="$emit('close')"><FontAwesomeIcon :icon="faXmark" /></BaseButton>
+			<BaseButton id="btn-close" :square="true" @click="$emit('close')"><FontAwesomeIcon :icon="faXmark" /></BaseButton>
 		</div>
 		<div id="text">
 			<slot></slot>	
@@ -50,18 +50,5 @@ import { faXmark } from '@fortawesome/free-solid-svg-icons';
 		align-items: flex-start;
 
 		gap: 1em;
-	}
-
-	#btn-close {
-		aspect-ratio: 1;
-		min-height: 0;
-
-		display: flex;
-
-		align-items: center;
-
-		padding: 0.25em;
-
-		margin-left: auto;
 	}
 </style>

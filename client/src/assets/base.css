@@ -22,34 +22,15 @@
 	--font-default: Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif;
 	--font-header: Oxygen, sans-serif;
 
-	--color-module: var(--v-color-blue);
-	--color-module-hover: hsl(from var(--color-module) h s calc(l - 0.2));
-	--color-module-selected: hsl(from var(--color-module) h s calc(l * 0.5));
+	--filter-module-hover: brightness(0.75);
 
-	--color-module-sold: hsl(from var(--color-module) h calc(s - 0.5) calc(l + 0.1));
-	--color-module-sold-hover: hsl(from var(--color-module-sold) h s calc(l - 0.1));
-	--color-module-sold-selected: hsl(from var(--color-module-sold) h s calc(l * 0.5));
+	--filter-module-sold: saturate(0.25) brightness(1.125);
+	--filter-module-sold-hover: saturate(0.25) brightness(0.75);
 
-	--color-inverter: var(--v-color-orange);
-	--color-inverter-hover: hsl(from var(--color-inverter) h calc(s * 0.8) calc(l * 0.8));
-	--color-inverter-selected: hsl(from var(--color-inverter) h s calc(l * 0.5));
+	--filter-battery-hover: saturate(0.8) brightness(0.8);
 
-	--color-inverter-sold: hsl(from var(--color-inverter) h calc(s * 0.25) calc(l * 1.5));
-	--color-inverter-sold-hover: hsl(from var(--color-inverter-sold) h calc(s * 0.8) calc(l * 0.8));
-	--color-inverter-sold-selected: hsl(from var(--color-inverter-sold) h s calc(l * 0.5));
-
-	--color-battery: var(--v-color-green);
-	--color-battery-hover: hsl(from var(--color-battery) h calc(s * 0.8) calc(l * 0.8));
-	--color-battery-selected: hsl(from var(--color-battery) h s calc(l * 0.5));
-
-	--color-battery-sold: hsl(from var(--color-battery) h calc(s * 0.25) calc(l * 1.5));
-	--color-battery-sold-hover: hsl(from var(--color-battery-sold) h calc(s * 0.8) calc(l * 0.8));
-	--color-battery-sold-selected: hsl(from var(--color-battery-sold) h s calc(l * 0.5));
-}
-
-* {
-	/* TODO replace with real font */
-	font-family: "Comic Sans MS";
+	--filter-battery-sold: saturate(0.25) brightness(1.125);
+	--filter-battery-sold-hover: saturate(0.25) brightness(0.75);
 }
 
 .blue {
@@ -98,4 +79,24 @@
 
 .nowrap {
 	text-wrap: nowrap;
+}
+
+.small {
+	font-size: 0.67em;
+}
+
+@media screen and (min-width: 600px) {
+	.float-right {
+		float: right;
+
+		margin-top: 0.25em;
+		margin-left: 1.5em;
+	}
+
+	.float-left {
+		float: left;
+
+		margin-top: 0.25em;
+		margin-right: 1.5em;
+	}
 }
