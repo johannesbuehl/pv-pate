@@ -81,7 +81,7 @@ import BaseImageTitle from './components/BaseImageTitle.vue';
 				Und davon hat auch die Kirche ihren Beitrag zu leisten. Schon in der frühen Planungsphase wurde das Augenmerk auf die regenerative Energie gerichtet. Alle Neubauten bekommen eine Fußbodenheizung, die Kirche ein neues Heizregister und die energetisch sanierten Bestandsgebäude die Möglichkeit die Vorlaufstemperatur zu reduzieren. Damit ist es möglich über <span class="blue bold">80 kW Wärmepumpen</span>, <span class="blue bold">3.000 l Wasserspeicher</span> und eine <span class="blue bold">99 kWp PV-Anlage</span> die Versorgung nachhaltig zu betreiben. Im Jahresmittel produzieren wir mehr regenerative Energie als verbraucht wird und leisten damit einen klimapositiven Beitrag.
 			</p>
 			<div id="psalm-container">
-				<BaseImageCredit style="width: 100%;" src="/solar_peterschreiber.media - istockphoto.com.webp" credit="peterschreiber.media - iStockphoto.com" />
+				<BaseImageCredit style="width: 100%;" src="/external/solar_peterschreiber.media - istockphoto.com.webp" credit="peterschreiber.media - iStockphoto.com" />
 				<div id="psalm">
 					<div class="bold white">
 						<div class="left">„Vom Aufgang der Sonne</div>
@@ -97,7 +97,7 @@ import BaseImageTitle from './components/BaseImageTitle.vue';
 				So lautet ein bekannter Kanon (Psalm 113,3).
 			</p>
 			<p>
-				<BaseImageTitle id="real-green-award" class="float-right" src="/real-green-award.webp">
+				<BaseImageTitle id="real-green-award" class="float-right" src="/external/real-green-award.webp">
 					Eine mit dem <span class="blue bold">REAL GREEN AWARD 2022</span> ausgezeichnete Idee steht kurz vor der Realisierung
 				</BaseImageTitle>
 				Wir stimmen dankbar ein und fügen in Zukunft gerne hinzu <span class="bold blue">„…und seien unsere Energiespeicher gut gefüllt“</span>. Denn in der Tat ist die Sonne ein Gottesgeschenk. Auch als wunderbarer „Lieferant“ für alle Energie und Wärme, die wir in unserem erneuerten Gemeindezentrum brauchen und die wir in Zukunft nicht mehr auf Kosten einer negativen CO<sub>2</sub>-Bilanz erzeugen wollen.
@@ -112,7 +112,7 @@ import BaseImageTitle from './components/BaseImageTitle.vue';
 				für ein CO<sub>2</sub>-freies Gemeindezentrum
 			</h3>
 			<div class="side-split">
-				<img id="banner-energiespenderin" src="/public/banner_energiespenderin.svg" />
+				<img id="banner-energiespenderin" src="/external/banner_energiespenderin.svg" />
 				<p>
 					Wählen Sie in der Grafik ein Element aus, für welches Sie die Patenschaft übernehmen möchten.
 					Nachdem Sie ihre E-Mail-Adresse eingegeben haben, senden wir ihnen den Spendenablauf zu.

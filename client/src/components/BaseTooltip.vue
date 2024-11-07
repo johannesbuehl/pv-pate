@@ -39,6 +39,10 @@ import { faXmark } from '@fortawesome/free-solid-svg-icons';
 		gap: 0.5em;
 	}
 
+	#btn-close {
+		margin-left: auto;
+	}
+
 	#header {
 		position: relative;
 

@@ -28,10 +28,7 @@ export default defineConfig({
 				admin: resolve(__dirname, "src/admin.html"),
 				datenschutz: resolve(__dirname, "src/legal/datenschutz.html"),
 				impressum: resolve(__dirname, "src/legal/impressum.html"),
-			},
-			external: [
-				"/public/banner_energiespenderin.svg"
-			]
+			}
 		}
 	},
 	resolve: {

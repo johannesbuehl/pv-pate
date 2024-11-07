@@ -32,7 +32,7 @@
 		} else {	
 			const mid_row = mid.slice(3, 4);
 			
-			for (let [row, roof] of Object.entries(row_roof_map)) {
+			for (let row of Object.keys(row_roof_map)) {
 				if (mid_row <= row) {
 					return `${get_element_type(mid)} ${mid.slice(3).toUpperCase()}`;
 				}
@@ -62,14 +62,14 @@
 </script>
 
 <script setup lang="ts">
-	import { onBeforeMount, onMounted, onUnmounted, ref, watch } from 'vue';
+	import { onBeforeMount, onMounted, onUnmounted, ref } from 'vue';
 	
 	import BaseTooltip from './BaseTooltip.vue';
 	import { is_element_available, get_element } from '@/lib';
 
 	const svg = ref<string>();
 
-	const svg_path = "elements/elements.svg";
+	const svg_path = "external/elements.svg";
 
 	const svg_wrapper = ref<HTMLDivElement>();
 	const tooltip = ref<HTMLDivElement>();
