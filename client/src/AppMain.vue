@@ -112,7 +112,7 @@ import BaseImageTitle from './components/BaseImageTitle.vue';
 				für ein CO<sub>2</sub>-freies Gemeindezentrum
 			</h3>
 			<div class="side-split">
-				<img id="banner-energiespenderin" src="@/public/banner_energiespenderin.svg"/>
+				<img id="banner-energiespenderin" src="/public/banner_energiespenderin.svg"/>
 				<p>
 					Wählen Sie in der Grafik ein Element aus, für welches Sie die Patenschaft übernehmen möchten.
 					Nachdem Sie ihre E-Mail-Adresse eingegeben haben, senden wir ihnen den Spendenablauf zu.
