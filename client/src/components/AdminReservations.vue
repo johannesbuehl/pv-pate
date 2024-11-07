@@ -138,7 +138,7 @@
 
 <style scoped>
 	#table-wrapper {
-		overflow-x: scroll;
+		overflow-x: auto;
 		max-width: 100%;
 	}
 
