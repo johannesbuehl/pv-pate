@@ -16,24 +16,27 @@ export default defineConfig({
 		},
 		host: true
 	},
-  plugins: [
-    vue(),
-  ],
-  build: {
-	  outDir: "../../dist/client",
-	  emptyOutDir: true,
-	  rollupOptions: {
-		  input: {
-			  index: resolve(__dirname, "src/index.html"),
-			  admin: resolve(__dirname, "src/admin.html"),
-			  datenschutz: resolve(__dirname, "src/legal/datenschutz.html"),
-			  impressum: resolve(__dirname, "src/legal/impressum.html"),
-		  }
-	  }
-  },
-  resolve: {
-    alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
-    }
-  }
+	plugins: [
+		vue(),
+	],
+	build: {
+		outDir: "../../dist/client",
+		emptyOutDir: true,
+		rollupOptions: {
+			input: {
+				index: resolve(__dirname, "src/index.html"),
+				admin: resolve(__dirname, "src/admin.html"),
+				datenschutz: resolve(__dirname, "src/legal/datenschutz.html"),
+				impressum: resolve(__dirname, "src/legal/impressum.html"),
+			},
+			external: [
+			"banner_energiespenderin.svg"
+			]
+		}
+	},
+	resolve: {
+		alias: {
+			'@': fileURLToPath(new URL('./src', import.meta.url))
+		}
+	}
 })

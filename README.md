@@ -9,3 +9,4 @@ Source-code for the fundraising-website of our photovoltaic-system
 - certificate: use better formatted names
 - simplify uploading non-git files to server (fonts, elements, inkscape, certificate-template) rsync-script?
 - johannes-logo?
+- deploy: restart backend
