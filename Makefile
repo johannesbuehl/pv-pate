@@ -2,9 +2,11 @@
 
 all: backend client
 
+out_dir = dist
+
 backend:
 	@echo "building server"
-	cd backend; go build -ldflags "-s -w"
+	cd backend; go build -ldflags "-s -w" -o ../$(out_dir)/backend/
 
 client:
 	@echo "building client"
