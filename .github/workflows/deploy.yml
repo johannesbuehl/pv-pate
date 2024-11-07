@@ -21,7 +21,7 @@ jobs:
       - name: upload files to server
         uses: burnett01/rsync-deployments@7.0.1
         with:
-          switches: -avzr --delete
+          switches: -avzrK --delete
           path: dist
           remote_path: ~/pv-spenden
           remote_host: ${{ secrets.DEPLOY_HOST }}
