@@ -30,7 +30,7 @@ export default defineConfig({
 				impressum: resolve(__dirname, "src/legal/impressum.html"),
 			},
 			external: [
-			"banner_energiespenderin.svg"
+				"/public/banner_energiespenderin.svg"
 			]
 		}
 	},
