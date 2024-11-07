@@ -11,22 +11,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
-      - name: Setup Go 1.23.x
-        uses: actions/setup-go@v5
+      - name: building client and server on remote machine
+        uses: appleboy/ssh-action@v1.1.0
         with:
-          go-version: '1.23.x'
-      - name: building client and server
-        run:  make
-      - name: upload files to server
-        uses: burnett01/rsync-deployments@7.0.1
-        with:
-          switches: -avzrK --delete
-          path: dist
-          remote_path: ~/pv-spenden
-          remote_host: ${{ secrets.DEPLOY_HOST }}
-          remote_user: ${{ secrets.DEPLOY_USER }}
-          remote_key: ${{ secrets.DEPLOY_KEY }}
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USERNAME }}
+          key: ${{ secrets.DEPLOY_KEY }}
+          script: cd pv-spende && make
       - name: restart the backend
         uses: appleboy/ssh-action@v1.1.0
         with:
