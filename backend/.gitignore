@@ -4,4 +4,5 @@ backend
 
 logs
 config.yaml
-certificates
+templates
+inkscape

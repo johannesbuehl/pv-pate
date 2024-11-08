@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"regexp"
 	"strings"
 	"text/template"
 	"time"
@@ -42,12 +43,15 @@ type ConfigYaml struct {
 		Port     int    `yaml:"port"`
 		User     string `yaml:"user"`
 		Password string `yaml:"password"`
-		Template struct {
-			Subject   string `json:"body"`
-			Body      string `yaml:"body"`
-			BodyPlain string `yaml:"body_plain"`
-		} `json:"template"`
+		Subject  string `yaml:"subject"`
 	} `yaml:"mail"`
+	ValidateElements struct {
+		Regex         string `yaml:"regex"`
+		ValidElements map[string]struct {
+			From int `yaml:"from"`
+			To   int `yaml:"to"`
+		} `yaml:"valid_elements"`
+	} `yaml:"validate_elements`
 }
 
 type CacheConfig struct {
@@ -66,11 +70,12 @@ type ConfigStruct struct {
 	Cache         CacheConfig
 	Reservation   ReservationConfig
 	Templates     ConfigTemplates
+	MidRegex      *regexp.Regexp
 }
 
 type ConfigTemplates struct {
 	Subject   *template.Template
-	Body      *template.Template
+	BodyHTML  *template.Template
 	BodyPlain *template.Template
 }
 
@@ -155,15 +160,23 @@ func loadConfig() ConfigStruct {
 			os.Exit(1)
 
 			// parse the templates
-		} else if mailSubjectTemplate, err := template.New("mailSubject").Parse(config.Mail.Template.Subject); err != nil {
+		} else if mailSubjectTemplate, err := template.New("mailSubject").Parse(config.Mail.Subject); err != nil {
 			fmt.Fprintf(os.Stderr, `Error parsing "mail.template.subject": %v`, err)
 
 			os.Exit(1)
-		} else if mailBodyTemplate, err := template.New("mailBody").Parse(config.Mail.Template.Body); err != nil {
+		} else if mailBodyHTMLTemplateString, err := os.ReadFile("templates/reservation_mail.html"); err != nil {
+			fmt.Fprintf(os.Stderr, `Error opening "templates/reservation_mail.html": %v`, err)
+
+			os.Exit(1)
+		} else if mailBodyHTMLTemplate, err := template.New("mailBody").Parse(string(mailBodyHTMLTemplateString)); err != nil {
 			fmt.Fprintf(os.Stderr, `Error parsing "mail.template.body": %v`, err)
 
 			os.Exit(1)
-		} else if mailBodyPlainTemplate, err := template.New("mailBodyPlain").Parse(config.Mail.Template.BodyPlain); err != nil {
+		} else if mailBodyPlainTemplateString, err := os.ReadFile("templates/reservation_mail.txt"); err != nil {
+			fmt.Fprintf(os.Stderr, `Error opening "templates/reservation_mail.txt": %v`, err)
+
+			os.Exit(1)
+		} else if mailBodyPlainTemplate, err := template.New("mailBodyPlain").Parse(string(mailBodyPlainTemplateString)); err != nil {
 			fmt.Fprintf(os.Stderr, `Error parsing "mail.template.body_plain": %v`, err)
 
 			os.Exit(1)
@@ -181,9 +194,10 @@ func loadConfig() ConfigStruct {
 				},
 				Templates: ConfigTemplates{
 					Subject:   mailSubjectTemplate,
-					Body:      mailBodyTemplate,
+					BodyHTML:  mailBodyHTMLTemplate,
 					BodyPlain: mailBodyPlainTemplate,
 				},
+				MidRegex: regexp.MustCompile(config.ValidateElements.Regex),
 			}
 		}
 
