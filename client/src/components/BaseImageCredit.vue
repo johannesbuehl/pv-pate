@@ -2,12 +2,13 @@
 	defineProps<{
 		src: string;
 		credit: string;
+		alt?: string;
 	}>();
 </script>
 
 <template>
 	<div class="image-credit">
-		<img :src="src" />
+		<img :src="src" :alt="alt"/>
 		<div id="credit">{{ credit }}</div>
 	</div>
 </template>

@@ -8,8 +8,8 @@
 	import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 	import { api_call, is_element_available, type APICallResult } from './lib';
 	import { elements_db, type ElementsDB } from './Globals';
-import BaseImageCredit from './components/BaseImageCredit.vue';
-import BaseImageTitle from './components/BaseImageTitle.vue';
+	import BaseImageCredit from './components/BaseImageCredit.vue';
+	import BaseImageTitle from './components/BaseImageTitle.vue';
 
 	const reserve_form = ref<HTMLFormElement>();
 
@@ -62,18 +62,7 @@ import BaseImageTitle from './components/BaseImageTitle.vue';
 <template>
 	<AppLayout>
 		<div id="text-content">
-			<div id="header" class="center">
-				<img src="/external/johanneslogo.svg" style="width: 13.5em; margin-inline: auto;" />
-				<div class="blue bold upper stretch" style="font-size: 1.175em;">
-					Wir bauen Gemeinde
-				</div>
-				<div class="green upper" style="font-size: 1.1em;">
-					Für Leute und morgen
-				</div>
-				<div class="orange">
-					klimafreundlich
-				</div>
-			</div>
+			<img id="header" src="/external/header_logo.svg" alt='Logo der evangelischen Kirchengemeinde Bühl "gemeinsam glauben leben" und dem Titel "WIR BAUEN GEMEINDE - FÜR LEUTE UND MORGEN - klimafreundlich"' />
 			<p class="center">
 				Ein <span class="blue upper bold">Klimaplus</span>-<span class="green upper bold">Gemeindezentrum</span> der Evangelischen Kirchengemeinde in Bühl
 			</p>
@@ -82,7 +71,7 @@ import BaseImageTitle from './components/BaseImageTitle.vue';
 				Und davon hat auch die Kirche ihren Beitrag zu leisten. Schon in der frühen Planungsphase wurde das Augenmerk auf die regenerative Energie gerichtet. Alle Neubauten bekommen eine Fußbodenheizung, die Kirche ein neues Heizregister und die energetisch sanierten Bestandsgebäude die Möglichkeit die Vorlaufstemperatur zu reduzieren. Damit ist es möglich über <span class="blue bold">80 kW Wärmepumpen</span>, <span class="blue bold">3.000 l Wasserspeicher</span> und eine <span class="blue bold">99 kWp PV-Anlage</span> die Versorgung nachhaltig zu betreiben. Im Jahresmittel produzieren wir mehr regenerative Energie als verbraucht wird und leisten damit einen klimapositiven Beitrag.
 			</p>
 			<div id="psalm-container">
-				<BaseImageCredit style="width: 100%;" src="/external/solar_peterschreiber.media - istockphoto.com.webp" credit="peterschreiber.media - iStockphoto.com" />
+				<BaseImageCredit style="width: 100%;" src="/external/solar_peterschreiber.media - istockphoto.com.webp" credit="peterschreiber.media - iStockphoto.com" alt="Aufnahme einer Fläche von Photovoltaik-Elemente. Die tiefstehende Sonne scheint von hinten über die Oberkante der Panele" />
 				<div id="psalm">
 					<div class="bold white">
 						<div class="left">„Vom Aufgang der Sonne</div>
@@ -98,7 +87,7 @@ import BaseImageTitle from './components/BaseImageTitle.vue';
 				So lautet ein bekannter Kanon (Psalm 113,3).
 			</p>
 			<p>
-				<BaseImageTitle id="real-green-award" class="float-right" src="/external/real-green-award.webp">
+				<BaseImageTitle id="real-green-award" class="float-right" src="/external/real-green-award.webp" alt='Preis mit der Aufschrift "REAL GREEN AWARD - Gewinner Jury Award 2022 Evangelische Kirchengemeinde Bühl"'>
 					Eine mit dem <span class="blue bold">REAL GREEN AWARD 2022</span> ausgezeichnete Idee steht kurz vor der Realisierung
 				</BaseImageTitle>
 				Wir stimmen dankbar ein und fügen in Zukunft gerne hinzu <span class="bold blue">„…und seien unsere Energiespeicher gut gefüllt“</span>. Denn in der Tat ist die Sonne ein Gottesgeschenk. Auch als wunderbarer „Lieferant“ für alle Energie und Wärme, die wir in unserem erneuerten Gemeindezentrum brauchen und die wir in Zukunft nicht mehr auf Kosten einer negativen CO<sub>2</sub>-Bilanz erzeugen wollen.
@@ -113,7 +102,7 @@ import BaseImageTitle from './components/BaseImageTitle.vue';
 				für ein CO<sub>2</sub>-freies Gemeindezentrum
 			</h3>
 			<div class="side-split">
-				<img id="banner-energiespenderin" src="/external/banner_energiespenderin.svg" />
+				<img id="banner-energiespenderin" src="/external/banner_energiespenderin.svg" alt="Werde Energiespenderin/in mit einer Klimaplus-Patenschaft">
 				<p>
 					Wählen Sie in der Grafik ein Element aus, für welches Sie die Patenschaft übernehmen möchten.
 					Nachdem Sie ihre E-Mail-Adresse eingegeben haben, senden wir ihnen den Spendenablauf zu.
@@ -123,35 +112,42 @@ import BaseImageTitle from './components/BaseImageTitle.vue';
 			<p>
 				Für folgende Komponenten unserer PV-Anlage können Sie Pate werden:
 			</p>
-			<table id="element-list">
-				<tbody>
-					<tr>
-						<td>1</td>
-						<td>122 St. PV-Indach-Module auf dem Kirchendach</td>
-						<td class="bold blue right nowrap">1.250 €</td>
-					</tr>
-					<tr>
-						<td>2</td>
-						<td>53 St. PV-Aufdach-Module auf dem Ostdach vom Kindergarten</td>
-						<td class="bold blue right nowrap">550 €</td>
-					</tr>
-					<tr>
-						<td>3</td>
-						<td>42 St. PV-Aufdach-Module auf dem Westdach vom Gemeindehaus</td>
-						<td class="bold blue right nowrap">550 €</td>
-					</tr>
-					<tr>
-						<td>4</td>
-						<td>28 St. PV-Aufdach-Module auf dem Süddach vom Pfarrhaus</td>
-						<td class="bold blue right nowrap">550 €</td>
-					</tr>
-					<tr>
-						<td>5</td>
-						<td>2 St. Batteriespeicher mit je 11 kWh</td>
-						<td class="bold blue right nowrap">12.000 €</td>
-					</tr>
-				</tbody>
-			</table>
+			<div id="table-wrapper">
+				<table id="element-list">
+					<tbody>
+						<tr>
+							<td>1</td>
+							<td>122 St. PV-Indach-Module auf dem Kirchendach</td>
+							<td class="bold blue" style="padding-inline: 1em">je</td>
+							<td class="bold blue right nowrap">1.250 €</td>
+						</tr>
+						<tr>
+							<td>2</td>
+							<td>53 St. PV-Aufdach-Module auf dem Ostdach vom Kindergarten</td>
+							<td class="bold blue" style="padding-inline: 1em">je</td>
+							<td class="bold blue right nowrap">550 €</td>
+						</tr>
+						<tr>
+							<td>3</td>
+							<td>42 St. PV-Aufdach-Module auf dem Westdach vom Gemeindehaus</td>
+							<td class="bold blue" style="padding-inline: 1em">je</td>
+							<td class="bold blue right nowrap">550 €</td>
+						</tr>
+						<tr>
+							<td>4</td>
+							<td>28 St. PV-Aufdach-Module auf dem Süddach vom Pfarrhaus</td>
+							<td class="bold blue" style="padding-inline: 1em">je</td>
+							<td class="bold blue right nowrap">550 €</td>
+						</tr>
+						<tr>
+							<td>5</td>
+							<td>2 St. Batteriespeicher mit je 11 kWh</td>
+							<td class="bold blue" style="padding-inline: 1em">je</td>
+							<td class="bold blue right nowrap">12.000 €</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
 		</div>
 		<BasePV
 			v-model:selected_element="selected_element"
@@ -218,11 +214,16 @@ import BaseImageTitle from './components/BaseImageTitle.vue';
 	}
 
 	#header {
-		font-family: var(--font-header);
+		margin-top: 1.25em;
 
-		font-size: 2.5em;
+		max-width: 100%;
 
-		margin-top: 0.5em;
+		width: 30em;
+
+		display: block;
+
+		margin-inline: auto;
+		margin-bottom: 2em;
 	}
 
 	#header > .stretch {
@@ -230,7 +231,7 @@ import BaseImageTitle from './components/BaseImageTitle.vue';
 	}
 
 	#text-content {
-		max-width: 40em;
+		max-width: min(40em, 100%);
 
 		padding-inline: 0.25em;
 
@@ -308,8 +309,13 @@ import BaseImageTitle from './components/BaseImageTitle.vue';
 		font-size: 0.8em;
 	}
 
+	#table-wrapper {
+		max-width: 100%;
+		overflow-x: auto;
+	}
+
 	#element-list {
-		max-width: 30em;
+		min-width: 20em;
 
 		margin-inline: auto;
 	}
@@ -331,11 +337,17 @@ import BaseImageTitle from './components/BaseImageTitle.vue';
 	}
 
 	#element-list td {
-		margin: 0.25em
+		margin: 0.25em;
+
+		/* text-wrap: nowrap; */
 	}
 
 	#reserve-input-box > input {
 		flex: 1;
+	}
+
+	#reserve-input-box p {
+		margin-block: unset;
 	}
 	
 	#input-email:invalid {
