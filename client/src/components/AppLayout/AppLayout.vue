@@ -41,7 +41,7 @@
 			:class="{ visible: hamburger_menu }"
 			@click="hamburger_menu = false"
 		>
-			<a v-if="!is_home('/') && user?.logged_in" href="/">Home</a>
+			<a v-if="!is_home('/')" href="/">Home</a>
 			
 			<template
 				v-if="user?.logged_in"
