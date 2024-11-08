@@ -68,7 +68,7 @@
 			</p>
 			<h2 class="bold">Klimaschutz ist Bewahrung der Schöpfung</h2>
 			<p>
-				Und davon hat auch die Kirche ihren Beitrag zu leisten. Schon in der frühen Planungsphase wurde das Augenmerk auf die regenerative Energie gerichtet. Alle Neubauten bekommen eine Fußbodenheizung, die Kirche ein neues Heizregister und die energetisch sanierten Bestandsgebäude die Möglichkeit die Vorlaufstemperatur zu reduzieren. Damit ist es möglich über <span class="blue bold">80 kW Wärmepumpen</span>, <span class="blue bold">3.000 l Wasserspeicher</span> und eine <span class="blue bold">99 kWp PV-Anlage</span> die Versorgung nachhaltig zu betreiben. Im Jahresmittel produzieren wir mehr regenerative Energie als verbraucht wird und leisten damit einen klimapositiven Beitrag.
+				Und davon hat auch die Kirche ihren Beitrag zu leisten. Schon in der frühen Planungsphase wurde das Augenmerk auf die regenerative Energie gerichtet. Alle Neubauten bekommen eine Fußbodenheizung, die Kirche ein neues Heizregister und die energetisch sanierten Bestandsgebäude die Möglichkeit, die Vorlaufstemperatur zu reduzieren. Damit ist es möglich, über <span class="blue bold">80 kW Wärmepumpen</span>, <span class="blue bold">3.000 l Wasserspeicher</span> und eine <span class="blue bold">99 kWp PV-Anlage</span> die Versorgung nachhaltig zu betreiben. Im Jahresmittel produzieren wir mehr regenerative Energie als verbraucht wird und leisten damit einen klimapositiven Beitrag.
 			</p>
 			<div id="psalm-container">
 				<BaseImageCredit style="width: 100%;" src="/external/solar_peterschreiber.media - istockphoto.com.webp" credit="peterschreiber.media - iStockphoto.com" alt="Aufnahme einer Fläche von Photovoltaik-Elemente. Die tiefstehende Sonne scheint von hinten über die Oberkante der Panele" />
@@ -84,16 +84,13 @@
 				</div>
 			</div>
 			<p>
-				So lautet ein bekannter Kanon (Psalm 113,3).
-			</p>
-			<p>
 				<BaseImageTitle id="real-green-award" class="float-right" src="/external/real-green-award.webp" alt='Preis mit der Aufschrift "REAL GREEN AWARD - Gewinner Jury Award 2022 Evangelische Kirchengemeinde Bühl"'>
 					Eine mit dem <span class="blue bold">REAL GREEN AWARD 2022</span> ausgezeichnete Idee steht kurz vor der Realisierung
 				</BaseImageTitle>
-				Wir stimmen dankbar ein und fügen in Zukunft gerne hinzu <span class="bold blue">„…und seien unsere Energiespeicher gut gefüllt“</span>. Denn in der Tat ist die Sonne ein Gottesgeschenk. Auch als wunderbarer „Lieferant“ für alle Energie und Wärme, die wir in unserem erneuerten Gemeindezentrum brauchen und die wir in Zukunft nicht mehr auf Kosten einer negativen CO<sub>2</sub>-Bilanz erzeugen wollen.
+				In dieses biblische Lied stimmen wir als Kirchengemeinde gerne ein und fügen in Zukunft hinzu <span class="blue bold">„… und seien unsere Energiespeicher gut gefüllt“</span>. Denn in der Tat ist die Sonne ein Gottesgeschenk. Auch als wunderbarer „Lieferant“ für alle Energie und Wärme, die wir in unserem erneuerten Gemeindezentrum brauchen und die wir in Zukunft nicht mehr auf Kosten einer negativen CO<sub>2</sub>-Bilanz erzeugen wollen.
 			</p>
 			<p>
-				Wer finanziert und spendet uns ein Solarpanel (oder mehrere)? Wer hilft uns dabei, sauber und sicher Energie zu gewinnen – für unsere Kirchengemeinde und für andere, indem wir unsere Überschüsse verkaufen, um Erträge für die Finanzierung des Gemeindezentrums zu generieren bzw. für den Stromkauf im Winter. Wer trägt dazu bei, unser Gemeindezentrum gut für die Zukunft aufzustellen und – auch im übertragenen Sinn – mehr Licht und Wärme in unsere Stadt zu bringen?
+				Wer trägt bei zur energetischen Sanierung unseres Gemeindezentrums? Wer hilft uns dabei, sauber und sicher Energie zu gewinnen (auch über die beiden Wärmepumpen)? Wer trägt dazu bei, unser Gemeindezentrum gut für die Zukunft aufzustellen und – auch im übertragenen Sinn – mehr Licht und Wärme in unsere Stadt zu bringen?
 			</p>
 			<h3 class="green bold">
 				<span class="upper">
