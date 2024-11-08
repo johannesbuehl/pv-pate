@@ -36,7 +36,46 @@ import BaseStatic from '@/BaseStatic.vue';
 			<li>Name, auf den die Patenschaft gelistet wird (sofern angegeben)</li>
 			<li>Datum und Uhrzeit der Reservierung (wird nach erfolgreicher Patenschaft oder Abbruch gelöscht)</li>
 		</ul>
-
+		<h4>
+			b. Auf welcher Rechtsgrundlage werden diese Daten verarbeitet?
+		</h4>
+		<p>
+			Die Daten werden auf der Grundlage des Art. 6 Abs. 1 Buchstabe f DS-GVO verarbeitet.
+		</p>
+		<h4>
+			d. Wie lange werden die Daten gespeichert?
+		</h4>
+		<p>
+			Die Daten werden gelöscht, sobald sie für die Erreichung des Zwecks ihrer Erhebung nicht mehr erforderlich sind.
+		</p>
+		<h3>
+			3. Betroffenenrechte
+		</h3>
+		<h4>
+			a. Recht auf Auskunft
+		</h4>
+		<p>
+			Sie können Auskunft nach Art. 15 DS-GVO über Ihre personenbezogenen Daten verlangen, die wir verarbeiten.
+		</p>
+		<h4>
+			b. Recht auf Widerspruch
+		</h4>
+			Sie haben ein Recht auf Widerspruch aus besonderen Gründen (siehe unter Punkt II).
+		<h4>
+			c. Recht auf Berichtigung
+		</h4>
+			Sollten die Sie betreffenden Angaben nicht (mehr) zutreffend sein, können Sie nach Art. 16 DS-GVO eine Berichtigung verlangen. Sollten Ihre Daten unvollständig sein, können Sie eine Vervollständigung verlangen.
+		<h4>
+			d. Recht auf Löschung
+		</h4>
+			Sie können nach Art. 17 DS-GVO die Löschung Ihrer personenbezogenen Daten verlangen.
+		<h4>
+			e. Recht auf Einschränkung der Verarbeitung
+		</h4>
+			Sie haben nach Art. 18 DS-GVO das Recht, eine Einschränkung der Verarbeitung Ihrer personenbezogenen Daten zu verlangen.
+		<h4>
+			f. Recht auf Beschwerde
+		</h4>
 		<p>
 			Wenn Sie der Ansicht sind, dass die Verarbeitung Ihrer personenbezogenen Daten gegen Datenschutzrecht verstößt, haben Sie nach Ar. 77 Abs. 1 DS-GVO das Recht, sich bei einer Datenschutzaufsichtsbehörde eigener Wahl zu beschweren.
 			Hierzu gehört auch die für den Verantwortlichen zuständige Datenschutzaufsichtsbehörde: Landesbeauftragter für Datenschutz und Informationsfreiheit Baden-Württemberg, <a href="https://www.baden-wuerttemberg.datenschutz.de/beschwerde">https://www.baden-wuerttemberg.datenschutz.de/beschwerde.</a>
