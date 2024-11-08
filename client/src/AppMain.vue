@@ -63,6 +63,7 @@ import BaseImageTitle from './components/BaseImageTitle.vue';
 	<AppLayout>
 		<div id="text-content">
 			<div id="header" class="center">
+				<img src="/external/johanneslogo.svg" style="width: 13.5em; margin-inline: auto;" />
 				<div class="blue bold upper stretch" style="font-size: 1.175em;">
 					Wir bauen Gemeinde
 				</div>
@@ -221,7 +222,7 @@ import BaseImageTitle from './components/BaseImageTitle.vue';
 
 		font-size: 2.5em;
 
-		margin-top: 2em;
+		margin-top: 0.5em;
 	}
 
 	#header > .stretch {
