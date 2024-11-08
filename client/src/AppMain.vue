@@ -99,10 +99,10 @@
 				für ein CO<sub>2</sub>-freies Gemeindezentrum
 			</h3>
 			<div class="side-split">
-				<img id="banner-energiespenderin" src="/external/banner_energiespenderin.svg" alt="Werde Energiespenderin/in mit einer Klimaplus-Patenschaft">
+				<img id="banner-energiepatin" src="/external/banner_energiepatin.svg" alt="Werde Energiepate/-patin mit einer Klimaplus-Patenschaft">
 				<p>
 					Wählen Sie in der Grafik ein Element aus, für welches Sie die Patenschaft übernehmen möchten.
-					Nachdem Sie ihre E-Mail-Adresse eingegeben haben, senden wir ihnen den Spendenablauf zu.
+					Nachdem Sie ihre E-Mail-Adresse eingegeben haben, senden wir ihnen den Patenschaftsablauf zu.
 					Wenn Sie namentlich in der Grafik genannt werden möchten, können Sie auch optional ihren Namen eintragen.
 				</p>
 			</div>
@@ -254,12 +254,12 @@
 		gap: 1em;
 	}
 
-	#banner-energiespenderin {
+	#banner-energiepatin {
 		display: none;
 	}
 
 	@media screen and (min-width: 875px) {
-		#banner-energiespenderin {
+		#banner-energiepatin {
 			display: unset;
 
 			height: 15em;
