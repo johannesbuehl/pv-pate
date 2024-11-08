@@ -51,7 +51,7 @@ type ConfigYaml struct {
 			From int `yaml:"from"`
 			To   int `yaml:"to"`
 		} `yaml:"valid_elements"`
-	} `yaml:"validate_elements`
+	} `yaml:"validate_elements"`
 }
 
 type CacheConfig struct {
