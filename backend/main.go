@@ -286,6 +286,24 @@ func extractJWT(c *fiber.Ctx) (int, int, error) {
 	}
 }
 
+func setSessionCookie(c *fiber.Ctx, jwt *string) {
+	var value string
+
+	if jwt == nil {
+		value = c.Cookies("session")
+	} else {
+		value = *jwt
+	}
+
+	c.Cookie(&fiber.Cookie{
+		Name:     "session",
+		Value:    value,
+		HTTPOnly: true,
+		SameSite: "strict",
+		MaxAge:   int(config.SessionExpire.Seconds()),
+	})
+}
+
 // checks wether the request is from a valid user
 func checkUser(c *fiber.Ctx) (bool, error) {
 	uid, tid, err := extractJWT(c)
@@ -302,7 +320,14 @@ func checkUser(c *fiber.Ctx) (bool, error) {
 	}
 
 	// if exactly one user came back and the tID is valid, the user is authorized
-	return len(response) == 1 && response[0].Tid == tid, err
+	if len(response) == 1 && response[0].Tid == tid {
+		// reset the expiration of the cookie
+		setSessionCookie(c, nil)
+
+		return true, err
+	} else {
+		return false, err
+	}
 }
 
 // checks wether the request is from the admin
@@ -1382,13 +1407,7 @@ func handleLogin(c *fiber.Ctx) error {
 
 						logger.Error().Msgf("json-webtoken creation failed: %v", err)
 					} else {
-						c.Cookie(&fiber.Cookie{
-							Name:     "session",
-							Value:    jwt,
-							HTTPOnly: true,
-							SameSite: "strict",
-							MaxAge:   int(config.SessionExpire.Seconds()),
-						})
+						setSessionCookie(c, &jwt)
 
 						response.Data = UserLogin{
 							Uid:      user.Uid,
