@@ -657,6 +657,17 @@ func getElementType(mid string) string {
 	}
 }
 
+func getElementArticle(mid string) string {
+	switch strings.Split(mid, "-")[0] {
+	case "pv":
+		return "das"
+	case "bs":
+		return "den"
+	default:
+		return ""
+	}
+}
+
 func getElementID(mid string) string {
 	return strings.ToUpper(strings.Split(mid, "-")[1])
 }
@@ -926,9 +937,8 @@ func getCertificates(c *fiber.Ctx) responseMessage {
 		} else {
 			// create the pdf
 			certData := CertificateData{
-				Mid:     mid,
-				Element: getElementType(mid),
-				Name:    res[0].Name,
+				Mid:  mid,
+				Name: res[0].Name,
 			}
 
 			if err := certData.create(); err != nil {
