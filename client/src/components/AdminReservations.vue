@@ -37,37 +37,6 @@
 
 			if (response.ok) {
 				reservations.value = await response.json();
-
-				const urlsearchparams = new URLSearchParams({ mid });
-
-				// request the certificate
-				const response_cert = await fetch(window.origin + "/pv/api/certificates?" + urlsearchparams.toString(), {
-					headers: {
-						// eslint-disable-next-line @typescript-eslint/naming-convention
-						"Content-Type": "application/json; charset=UTF-8"
-					},
-					credentials: "include",
-					method: "GET"
-				});
-
-				if (response_cert.ok) {
-					if (download_ref.value !== undefined) {
-						// set the file-name
-						const header = response_cert.headers.get('Content-Disposition');
-						const parts = header?.split(';');
-						const filename = parts?.[1].split('=')[1]?.replaceAll("\"", "");
-
-						if (filename !== undefined) {
-							download_ref.value.download = filename;
-						}
-
-						const url = window.URL.createObjectURL(await response_cert.blob());
-
-						download_ref.value.href = url;
-						download_ref.value.click();
-						window.URL.revokeObjectURL(url);
-					}
-				}
 			}
 		}
 	}

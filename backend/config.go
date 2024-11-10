@@ -4,10 +4,10 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"regexp"
 	"strings"
-	"text/template"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -39,11 +39,14 @@ type ConfigYaml struct {
 		Expiration string `yaml:"expiration"`
 	} `yaml:"reservation"`
 	Mail struct {
-		Server   string `yaml:"server"`
-		Port     int    `yaml:"port"`
-		User     string `yaml:"user"`
-		Password string `yaml:"password"`
-		Subject  string `yaml:"subject"`
+		Server    string `yaml:"server"`
+		Port      int    `yaml:"port"`
+		User      string `yaml:"user"`
+		Password  string `yaml:"password"`
+		Templates struct {
+			ReservationSubject string `yaml:"reservation_subject"`
+			CertificateSubject string `yaml:"certificate_subject"`
+		} `yaml:"subject_templates"`
 	} `yaml:"mail"`
 	ValidateElements struct {
 		Regex         string `yaml:"regex"`
@@ -69,14 +72,7 @@ type ConfigStruct struct {
 	SessionExpire time.Duration
 	Cache         CacheConfig
 	Reservation   ReservationConfig
-	Templates     ConfigTemplates
 	MidRegex      *regexp.Regexp
-}
-
-type ConfigTemplates struct {
-	Subject   *template.Template
-	BodyHTML  *template.Template
-	BodyPlain *template.Template
 }
 
 var config ConfigStruct
@@ -146,40 +142,15 @@ func loadConfig() ConfigStruct {
 
 		// parse the durations
 		if session_expire, err := time.ParseDuration(config.ClientSession.Expire); err != nil {
-			fmt.Fprintf(os.Stderr, `Error parsing "client_session.expire": %v`, err)
-			os.Exit(1)
+			log.Fatalf(`Error parsing "client_session.expire": %v`, err)
 		} else if cacheExpire, err := time.ParseDuration(config.Cache.Expiration); err != nil {
-			fmt.Fprintf(os.Stderr, `Error parsing "cache.expiration": %v`, err)
-			os.Exit(1)
+			log.Fatalf(`Error parsing "cache.expiration": %v`, err)
 		} else if cachePurge, err := time.ParseDuration(config.Cache.Purge); err != nil {
-			fmt.Fprintf(os.Stderr, `Error parsing "cache.purge": %v`, err)
-			os.Exit(1)
-
+			log.Fatalf(`Error parsing "cache.purge": %v`, err)
 		} else if reservationExpire, err := time.ParseDuration(config.Reservation.Expiration); err != nil {
-			fmt.Fprintf(os.Stderr, `Error parsing "reservation.expiration": %v`, err)
-			os.Exit(1)
+			log.Fatalf(`Error parsing "reservation.expiration": %v`, err)
 
 			// parse the templates
-		} else if mailSubjectTemplate, err := template.New("mailSubject").Parse(config.Mail.Subject); err != nil {
-			fmt.Fprintf(os.Stderr, `Error parsing "mail.template.subject": %v`, err)
-
-			os.Exit(1)
-		} else if mailBodyHTMLTemplateString, err := os.ReadFile("templates/reservation_mail.html"); err != nil {
-			fmt.Fprintf(os.Stderr, `Error opening "templates/reservation_mail.html": %v`, err)
-
-			os.Exit(1)
-		} else if mailBodyHTMLTemplate, err := template.New("mailBody").Parse(string(mailBodyHTMLTemplateString)); err != nil {
-			fmt.Fprintf(os.Stderr, `Error parsing "mail.template.body": %v`, err)
-
-			os.Exit(1)
-		} else if mailBodyPlainTemplateString, err := os.ReadFile("templates/reservation_mail.txt"); err != nil {
-			fmt.Fprintf(os.Stderr, `Error opening "templates/reservation_mail.txt": %v`, err)
-
-			os.Exit(1)
-		} else if mailBodyPlainTemplate, err := template.New("mailBodyPlain").Parse(string(mailBodyPlainTemplateString)); err != nil {
-			fmt.Fprintf(os.Stderr, `Error parsing "mail.template.body_plain": %v`, err)
-
-			os.Exit(1)
 		} else {
 			configStruct = ConfigStruct{
 				ConfigYaml:    config,
@@ -191,11 +162,6 @@ func loadConfig() ConfigStruct {
 				},
 				Reservation: ReservationConfig{
 					Expiration: reservationExpire,
-				},
-				Templates: ConfigTemplates{
-					Subject:   mailSubjectTemplate,
-					BodyHTML:  mailBodyHTMLTemplate,
-					BodyPlain: mailBodyPlainTemplate,
 				},
 				MidRegex: regexp.MustCompile(config.ValidateElements.Regex),
 			}

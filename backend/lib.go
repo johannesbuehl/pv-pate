@@ -1,8 +1,12 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
+	templateHTML "html/template"
+	"os"
 	"reflect"
+	"text/template"
 )
 
 func strucToMap(data any) (map[string]any, error) {
@@ -27,4 +31,44 @@ func strucToMap(data any) (map[string]any, error) {
 	}
 
 	return result, nil
+}
+
+func loadTemplate(pth string) (*template.Template, error) {
+	if buf, err := os.ReadFile(pth); err != nil {
+		return nil, err
+	} else {
+		return template.New(pth).Parse(string(buf))
+	}
+}
+
+func parseTemplate(pth string, vals any) (string, error) {
+	if tpl, err := loadTemplate(pth); err != nil {
+		return "", err
+	} else {
+		var buf bytes.Buffer
+
+		err = tpl.Execute(&buf, vals)
+
+		return buf.String(), err
+	}
+}
+
+func loadHTMLTemplate(pth string) (*templateHTML.Template, error) {
+	if buf, err := os.ReadFile(pth); err != nil {
+		return nil, err
+	} else {
+		return templateHTML.New(pth).Parse(string(buf))
+	}
+}
+
+func parseHTMLTemplate(pth string, vals any) (string, error) {
+	if tpl, err := loadTemplate(pth); err != nil {
+		return "", err
+	} else {
+		var buf bytes.Buffer
+
+		err = tpl.Execute(&buf, vals)
+
+		return buf.String(), err
+	}
 }

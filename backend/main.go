@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"database/sql"
 	"fmt"
 	"reflect"
@@ -358,17 +357,13 @@ type ElementDB struct {
 	Mid         string  `json:"mid"`
 	Name        string  `json:"name"`
 	Reservation *string `json:"reservation"`
+	Mail        *string `json:"mail"`
 }
 
 type ElementDBNoReservation struct {
-	Mid  string `json:"mid"`
-	Name string `json:"name"`
-}
-
-type ElementDBReservationString struct {
-	Mid         string `json:"mid"`
-	Name        string `json:"name"`
-	Reservation string `json:"reservation"`
+	Mid  string  `json:"mid"`
+	Name string  `json:"name"`
+	Mail *string `json:"mail"`
 }
 
 // client-data of the reserved elements
@@ -500,7 +495,7 @@ func postElements(c *fiber.Ctx) responseMessage {
 		response.Status = fiber.StatusBadRequest
 		response.Message = "invalid message-body"
 
-		logger.Warn().Msg(`body can't be parsed as "struct{ name string }"`)
+		logger.Warn().Msg(`body can't be parsed as "struct{ name string mail string}"`)
 	} else {
 		elements, found := dbCache.Get("elements")
 
@@ -537,9 +532,9 @@ func postElements(c *fiber.Ctx) responseMessage {
 
 			// send the reservation e-mail
 			data := ReservationData{
-				Mail:        body.Mail,
-				ElementType: getElementType(mid),
-				Element:     getElementID(mid),
+				Mail: body.Mail,
+				Mid:  mid,
+				Name: body.Name,
 			}
 
 			if err := data.sendReservationEmail(); err != nil {
@@ -549,7 +544,7 @@ func postElements(c *fiber.Ctx) responseMessage {
 				dbCache.Delete("elements")
 
 				// write the data to the database
-				if err := dbInsert("elements", ElementDBNoReservation{Mid: mid, Name: body.Name}); err != nil {
+				if err := dbInsert("elements", ElementDBNoReservation{Mid: mid, Name: body.Name, Mail: &body.Mail}); err != nil {
 					response.Status = fiber.StatusInternalServerError
 					response.Message = "error while writing reservation to database"
 
@@ -593,40 +588,36 @@ func getElementID(mid string) string {
 }
 
 type ReservationData struct {
-	Mail        string
-	ElementType string
-	Element     string
+	Mail string
+	Mid  string
+	Name string
 }
 
 func (data ReservationData) sendReservationEmail() error {
 	email := mail.NewMSG()
 
-	var headerBuffer bytes.Buffer
-	var bodyBuffer bytes.Buffer
-	var bodyBufferPlain bytes.Buffer
-
-	if err := config.Templates.Subject.Execute(&headerBuffer, data); err != nil {
+	if subject, err := parseTemplate("templates/reservation_mail", data); err != nil {
 		return err
-	} else if err := config.Templates.BodyHTML.Execute(&bodyBuffer, data); err != nil {
+	} else if bodyHTML, err := parseHTMLTemplate("templates/reservation_mail.html", data); err != nil {
 		return err
-	} else if err := config.Templates.BodyPlain.Execute(&bodyBufferPlain, data); err != nil {
-		return err
-	}
-
-	email.SetFrom(fmt.Sprintf("Klimaplus-Patenschaft <%s>", config.Mail.User)).AddTo(data.Mail).SetSubject(headerBuffer.String())
-
-	email.SetBody(mail.TextPlain, bodyBufferPlain.String())
-
-	email.AddAlternative(mail.TextHTML, bodyBuffer.String())
-
-	if mailClient, err := mailServer.Connect(); err != nil {
-		logger.Fatal().Msgf("can't connect to to mail-server: %v", err)
-
-		return err
-	} else if err := email.Send(mailClient); err != nil {
+	} else if bodyPlain, err := parseHTMLTemplate("templates/reservation_mail.txt", data); err != nil {
 		return err
 	} else {
-		return nil
+		email.SetFrom(fmt.Sprintf("Klimaplus-Patenschaft <%s>", config.Mail.User)).AddTo(data.Mail).SetSubject(subject)
+
+		email.SetBody(mail.TextPlain, bodyHTML)
+
+		email.AddAlternative(mail.TextHTML, bodyPlain)
+
+		if mailClient, err := mailServer.Connect(); err != nil {
+			logger.Fatal().Msgf("can't connect to to mail-server: %v", err)
+
+			return err
+		} else if err := email.Send(mailClient); err != nil {
+			return err
+		} else {
+			return nil
+		}
 	}
 }
 
@@ -790,15 +781,13 @@ func getReservations(c *fiber.Ctx) responseMessage {
 		response.Status = fiber.StatusUnauthorized
 
 		logger.Info().Msg("request in not authorized")
+	} else if res, err := dbSelect[ElementDB]("elements", "reservation IS NOT NULL"); err != nil {
+		response.Status = fiber.StatusInternalServerError
+
+		logger.Error().Msgf("can't get reserved elements from database: %v", err)
 	} else {
-		if res, err := dbSelect[ElementDBReservationString]("elements", "reservation IS NOT NULL"); err != nil {
-			response.Status = fiber.StatusInternalServerError
 
-			logger.Error().Msgf("can't get reserved elements from database: %v", err)
-		} else {
-
-			response.Data = res
-		}
+		response.Data = res
 	}
 
 	return response
@@ -857,8 +846,10 @@ func getCertificates(c *fiber.Ctx) responseMessage {
 		} else {
 			// create the pdf
 			certData := CertificateData{
-				Mid:  mid,
-				Name: res[0].Name,
+				Reservation: ReservationData{
+					Mid:  mid,
+					Name: res[0].Name,
+				},
 			}
 
 			if err := certData.create(); err != nil {
@@ -953,8 +944,39 @@ func postReservations(c *fiber.Ctx) responseMessage {
 		response.Message = "query doesn't include valid mid"
 
 		logger.Info().Msg("query doesn't include valid mid")
+	} else if userData, err := dbSelect[ElementDB]("elements", "mid = ?", mid); err != nil {
+		response.Status = fiber.StatusInternalServerError
+
+		logger.Error().Msgf("can't retrieve element-data for %q: %v", mid, err)
+	} else if len(userData) != 1 {
+		response.Status = fiber.StatusNotFound
+		response.Message = "no reservation found"
+
+		logger.Info().Msgf("no element-reservation for %q", mid)
 	} else {
-		if err := dbUpdate("elements", struct{ Reservation *string }{Reservation: nil}, struct{ Mid string }{Mid: mid}); err != nil {
+		// create the certificate and send it via e-mail
+		certData := CertificateData{
+			Reservation: ReservationData{
+				Mid:  mid,
+				Name: userData[0].Name,
+				Mail: *userData[0].Mail,
+			},
+		}
+
+		if err := certData.create(); err != nil {
+			response.Status = fiber.StatusInternalServerError
+			response.Message = "error while creating certificate"
+
+			logger.Error().Msgf("can't create certificate for %q: %v", mid, err)
+		} else if err := certData.send(); err != nil {
+			response.Status = fiber.StatusInternalServerError
+			response.Message = "error while sending certificate"
+
+			logger.Error().Msgf("can't send certificate for %q: %v", mid, err)
+		} else if err := dbUpdate("elements", struct {
+			Reservation *string
+			Mail        *string
+		}{}, struct{ Mid string }{Mid: mid}); err != nil {
 			response.Status = fiber.StatusInternalServerError
 
 			logger.Error().Msgf("can't write reservation-confirm to database for %q: %v", mid, err)
