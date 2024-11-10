@@ -25,7 +25,7 @@
 
 			let confirm_string = `Reservierung bestätigen?\nE-Mail: ${selected_element.value?.email}\n`;
 
-			if (selected_element.value?.name != undefined && !selected_element.value.name && selected_element.value?.name?.length > 1) {
+			if (selected_element.value?.name != undefined && !!selected_element.value.name && selected_element.value?.name?.length > 1) {
 				confirm_string += `Name: ${selected_element.value?.name}`;
 			} else {
 				confirm_string += `Ohne Namen`;
