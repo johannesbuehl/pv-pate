@@ -110,5 +110,9 @@ func (data CertificateData) send() error {
 }
 
 func (data *CertificateData) cleanup() error {
-	return os.Remove(data.PDFFile)
+	if data.PDFFile != "" {
+		return os.Remove(data.PDFFile)
+	} else {
+		return nil
+	}
 }

@@ -963,6 +963,8 @@ func postReservations(c *fiber.Ctx) responseMessage {
 			},
 		}
 
+		defer certData.cleanup()
+
 		if err := certData.create(); err != nil {
 			response.Status = fiber.StatusInternalServerError
 			response.Message = "error while creating certificate"
