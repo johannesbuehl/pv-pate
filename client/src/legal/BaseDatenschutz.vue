@@ -35,6 +35,7 @@ import BaseStatic from '@/BaseStatic.vue';
 			<li>Identifikationsnummer des Elements</li>
 			<li>Name, auf den die Patenschaft gelistet wird (sofern angegeben)</li>
 			<li>Datum und Uhrzeit der Reservierung (wird nach erfolgreicher Patenschaft oder Abbruch gelöscht)</li>
+			<li>E-Mail-Adresse (wird nach erfolgreicher Patenschaft oder Abbruch gelöscht)</li>
 		</ul>
 		<h4>
 			b. Auf welcher Rechtsgrundlage werden diese Daten verarbeitet?
