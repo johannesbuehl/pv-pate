@@ -58,6 +58,10 @@
 
 			if (response.ok) {
 				store_users(await response.json())
+
+				// clear the input-boxes
+				add_user_name_input.value = "";
+				add_user_password_input.value = "";
 			}
 		}
 	}
