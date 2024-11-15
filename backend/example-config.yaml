@@ -19,7 +19,7 @@ mail:
   port: 587
   user: user@example.org
   password: PASSWORD
-valdiate_elements:
+validate_elements:
   regex: ^(pv-\w|(?:wr|bs)-)(\d{1,2})$
   valid_elements:
     bs-:
