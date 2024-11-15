@@ -19,7 +19,75 @@ mail:
   port: 587
   user: user@example.org
   password: PASSWORD
-  template:
-    subject: {{.ElementType}} {{.Element}}
-    body_plain: plain-text-body
-    body: html-body
+valdiate_elements:
+  regex: ^(pv-\w|(?:wr|bs)-)(\d{1,2})$
+  valid_elements:
+    bs-:
+      from: 1
+      to: 2
+    pv-a:
+      from: 1
+      to: 16
+    pv-b:
+      from: 2
+      to: 37
+    pv-c:
+      from: 3
+      to: 37
+    pv-d:
+      from: 3
+      to: 37
+    pv-e:
+      from: 1
+      to: 6
+    pv-f:
+      from: 1
+      to: 6
+    pv-g:
+      from: 1
+      to: 6
+    pv-h:
+      from: 1
+      to: 7
+    pv-i:
+      from: 1
+      to: 7
+    pv-j:
+      from: 1
+      to: 7
+    pv-k:
+      from: 1
+      to: 7
+    pv-l:
+      from: 1
+      to: 7
+    pv-m:
+      from: 1
+      to: 7
+    pv-n:
+      from: 1
+      to: 7
+    pv-o:
+      from: 1
+      to: 7
+    pv-p:
+      from: 1
+      to: 7
+    pv-q:
+      from: 1
+      to: 7
+    pv-r:
+      from: 1
+      to: 7
+    pv-s:
+      from: 1
+      to: 7
+    pv-t:
+      from: 1
+      to: 7
+    pv-u:
+      from: 1
+      to: 7
+    pv-v:
+      from: 1
+      to: 7
