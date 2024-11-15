@@ -596,11 +596,14 @@ type ReservationData struct {
 func (data ReservationData) sendReservationEmail() error {
 	email := mail.NewMSG()
 
-	if subject, err := parseTemplate("templates/reservation_mail", data); err != nil {
+	templateData := SponsorshipTemplateData{}
+	templateData.populate(data.Mid, data.Name)
+
+	if subject, err := parseTemplate("templates/reservation_mail", templateData); err != nil {
 		return err
-	} else if bodyHTML, err := parseHTMLTemplate("templates/reservation_mail.html", data); err != nil {
+	} else if bodyHTML, err := parseHTMLTemplate("templates/reservation_mail.html", templateData); err != nil {
 		return err
-	} else if bodyPlain, err := parseHTMLTemplate("templates/reservation_mail.txt", data); err != nil {
+	} else if bodyPlain, err := parseHTMLTemplate("templates/reservation_mail.txt", templateData); err != nil {
 		return err
 	} else {
 		email.SetFrom(fmt.Sprintf("Klimaplus-Patenschaft <%s>", config.Mail.User)).AddTo(data.Mail).SetSubject(subject)

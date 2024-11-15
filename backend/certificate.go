@@ -12,11 +12,11 @@ import (
 
 type CertificateData struct {
 	Reservation  ReservationData
-	TemplateData CertificateTemplate
+	TemplateData SponsorshipTemplateData
 	PDFFile      string
 }
 
-type CertificateTemplate struct {
+type SponsorshipTemplateData struct {
 	Element string
 	Article string
 	Date    string
@@ -27,14 +27,18 @@ var months = [12]string{
 	"Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember",
 }
 
-func (data *CertificateData) create() error {
-	now := time.Now()
+func (data *SponsorshipTemplateData) populate(mid, name string) {
+	*data = SponsorshipTemplateData{
+		Name:    name,
+		Element: fmt.Sprintf("%s %s", getElementType(mid), getElementID(mid)),
+		Article: getElementArticle(mid),
+		Date:    time.Now().Format(fmt.Sprintf("2. %s 2006", months[time.Now().Month()-1])),
+	}
+}
 
+func (data *CertificateData) create() error {
 	// populate the template-data
-	data.TemplateData.Name = data.Reservation.Name
-	data.TemplateData.Element = fmt.Sprintf("%s %s", getElementType(data.Reservation.Mid), getElementID(data.Reservation.Mid))
-	data.TemplateData.Article = getElementArticle(data.Reservation.Mid)
-	data.TemplateData.Date = time.Now().Format(fmt.Sprintf("2. %s 2006", months[now.Month()-1]))
+	data.TemplateData.populate(data.Reservation.Mid, data.Reservation.Name)
 
 	// choose the svg-template wether a name is given or not
 	var templateName string
