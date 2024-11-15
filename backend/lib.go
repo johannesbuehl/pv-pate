@@ -62,7 +62,7 @@ func loadHTMLTemplate(pth string) (*templateHTML.Template, error) {
 }
 
 func parseHTMLTemplate(pth string, vals any) (string, error) {
-	if tpl, err := loadTemplate(pth); err != nil {
+	if tpl, err := loadHTMLTemplate(pth); err != nil {
 		return "", err
 	} else {
 		var buf bytes.Buffer
