@@ -34,16 +34,22 @@ type ConfigYaml struct {
 		Expiration string `yaml:"expiration"`
 	} `yaml:"reservation"`
 	Mail struct {
-		Server   string `yaml:"server"`
-		Port     int    `yaml:"port"`
-		User     string `yaml:"user"`
-		Password string `yaml:"password"`
-		Template struct {
-			Subject   string `json:"body"`
-			Body      string `yaml:"body"`
-			BodyPlain string `yaml:"body_plain"`
-		} `json:"template"`
+		Server    string `yaml:"server"`
+		Port      int    `yaml:"port"`
+		User      string `yaml:"user"`
+		Password  string `yaml:"password"`
+		Templates struct {
+			ReservationSubject string `yaml:"reservation_subject"`
+			CertificateSubject string `yaml:"certificate_subject"`
+		} `yaml:"subject_templates"`
 	} `yaml:"mail"`
+	ValidateElements struct {
+		Regex         string `yaml:"regex"`
+		ValidElements map[string]struct {
+			From int `yaml:"from"`
+			To   int `yaml:"to"`
+		} `yaml:"valid_elements"`
+	} `yaml:"validate_elements"`
 }
 
 type CacheConfig struct {
