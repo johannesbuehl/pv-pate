@@ -1537,14 +1537,14 @@ func main() {
 	}
 
 	// handle specific requests special
-	app.Get("/pv/api/welcome", handleWelcome)
-	app.Post("/pv/api/login", handleLogin)
-	app.Get("/pv/api/logout", handleLogout)
+	app.Get("/api/welcome", handleWelcome)
+	app.Post("/api/login", handleLogin)
+	app.Get("/api/logout", handleLogout)
 
 	// register the registered endpoints
 	for method, handlers := range endpoints {
 		for address, handler := range handlers {
-			handleMethods[method]("/pv/api/"+address, func(c *fiber.Ctx) error {
+			handleMethods[method]("/api/"+address, func(c *fiber.Ctx) error {
 				logger.Debug().Msgf("HTTP %s request: %q", c.Method(), c.OriginalURL())
 
 				return handler(c).send(c)

@@ -9,7 +9,7 @@ export default defineConfig({
 	root: "src",
 	server: {
 		proxy: {
-			"/pv/api": {
+			"/api": {
 				target: "http://127.0.0.1:61016",
 				changeOrigin: true
 			},

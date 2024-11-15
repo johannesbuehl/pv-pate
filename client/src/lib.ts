@@ -84,7 +84,7 @@ export async function api_call<K extends object>(
 	params?: QueryParams,
 	body?: object,
 ): Promise<APICallResult<K>> {
-	let url = window.origin + "/pv/api/" + api;
+	let url = window.origin + "/api/" + api;
 
 	if (params) {
 		const urlsearchparams = new URLSearchParams(

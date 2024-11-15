@@ -88,7 +88,7 @@ import BaseButton from './BaseButton.vue';
 					</th>
 					<th class="center">
 						<form
-							action="/pv/api/certificates"
+							action="/api/certificates"
 							target="_blank"
 						>
 							<input type="text" name="mid" style="display: none;" :value="sponsorship.mid" />
