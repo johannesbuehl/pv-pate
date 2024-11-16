@@ -608,9 +608,9 @@ func (data ReservationData) sendReservationEmail() error {
 	} else {
 		email.SetFrom(fmt.Sprintf("Klimaplus-Patenschaft <%s>", config.Mail.User)).AddTo(data.Mail).SetSubject(subject)
 
-		email.SetBody(mail.TextPlain, bodyHTML)
+		email.SetBody(mail.TextPlain, bodyPlain)
 
-		email.AddAlternative(mail.TextHTML, bodyPlain)
+		email.AddAlternative(mail.TextHTML, bodyHTML)
 
 		if mailClient, err := mailServer.Connect(); err != nil {
 			logger.Fatal().Msgf("can't connect to to mail-server: %v", err)

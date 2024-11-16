@@ -93,9 +93,9 @@ func (data CertificateData) send() error {
 	} else {
 		email.SetFrom(fmt.Sprintf("Klimaplus-Patenschaft <%s>", config.Mail.User)).AddTo(data.Reservation.Mail).SetSubject(subject)
 
-		email.SetBody(mail.TextPlain, bodyHTML)
+		email.SetBody(mail.TextPlain, bodyPlain)
 
-		email.AddAlternative(mail.TextHTML, bodyPlain)
+		email.AddAlternative(mail.TextHTML, bodyHTML)
 
 		email.Attach(&mail.File{
 			FilePath: data.PDFFile,
