@@ -90,16 +90,33 @@
 				In dieses biblische Lied stimmen wir als Kirchengemeinde gerne ein und fügen in Zukunft hinzu <span class="blue bold">„… und seien unsere Energiespeicher gut gefüllt“</span>. Denn in der Tat ist die Sonne ein Gottesgeschenk. Auch als wunderbarer „Lieferant“ für alle Energie und Wärme, die wir in unserem erneuerten Gemeindezentrum brauchen und die wir in Zukunft nicht mehr auf Kosten einer negativen CO<sub>2</sub>-Bilanz erzeugen wollen.
 			</p>
 			<p>
-				Wer trägt bei zur energetischen Sanierung unseres Gemeindezentrums? Wer hilft uns dabei, sauber und sicher Energie zu gewinnen (auch über die beiden Wärmepumpen)? Wer trägt dazu bei, unser Gemeindezentrum gut für die Zukunft aufzustellen und – auch im übertragenen Sinn – mehr Licht und Wärme in unsere Stadt zu bringen?
+				Wer trägt bei zur energetischen Sanierung unseres Gemeindezentrums?
+				Wer hilft uns dabei, sauber und sicher Energie über die beiden Wärmepumpen zu produieren?
+				Wer trägt dazu bei, unser Gemeindezentrum gut für die Zukunft aufzustellen und – auch im übertragenen Sinn – mehr Licht und Wärme in unsere Stadt zu bringen?
+			</p>
+			<h3>
+				Die 7 wichtigsten Maßnahmen auf dem Web zur KlimaPlus-Kirche:
+			</h3>
+			<ol>
+    			<li>Das konsequente Dämmen der Gebäudehülle mit neuen Fenster- und Glasfassaden und einer neuen Dämmung des Kirchen- und Saaldachs.</li>
+    			<li>Das Abschalten des Gasbrenners und der Installation von zwei leistungsstarken Wärmepumpen.</li>
+    			<li>Eine Fußbodenheizung in allen Neubauten.</li>
+    			<li>Ein neues Niedrigtemperatur-Heizregister für die Kirchenheizung.</li>
+    			<li>Die solare Aktivierung der Dachflächen.</li>
+    			<li>Rigolen und eine Zisterne, um Regenwasser auf dem Grundstück versickern zu lassen.</li>
+    			<li>Ein Gründach für einen positiven Beitrag für ein angenehmes Stadtklima.</li>
+			</ol>
+			<p>
+				Die Investition für die Zukunft und für den Klimaschutz gibt es nicht umsonst.
+				Insgesamt belaufen sich die 7 Maßnahmen auf eine Summe von über 800.000 €.
+				Eine wichtige und richtige Investition zum Erhalt der Schöpfung.  
 			</p>
 			<h3 class="green bold">
 				<span class="upper">
-					Und so werden Sie <span class="blue">Klimaplus</span>-Pate und -Patin
+					Werden auch Sie <span class="blue">Klimaplus</span>-Pate und -Patin
 				</span>
-				für ein CO<sub>2</sub>-freies Gemeindezentrum
 			</h3>
 			<div class="side-split">
-				<img id="banner-energiepatin" src="/external/banner_energiepatin.svg" alt="Werde Energiepate/-patin mit einer Klimaplus-Patenschaft">
 				<p>
 					Wählen Sie in der Grafik ein Element aus, für welches Sie die Patenschaft übernehmen möchten.
 					Nachdem Sie ihre E-Mail-Adresse eingegeben haben, senden wir ihnen den Patenschaftsablauf zu.
