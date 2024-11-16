@@ -63,12 +63,16 @@
 	<AppLayout>
 		<div id="text-content">
 			<img id="header" src="/external/header_logo.svg" alt='Logo der evangelischen Kirchengemeinde Bühl "gemeinsam glauben leben" und dem Titel "WIR BAUEN GEMEINDE - FÜR LEUTE UND MORGEN - klimafreundlich"' />
-			<p class="center">
+			<div class="center">
 				Ein <span class="blue upper bold">Klimaplus</span>-<span class="green upper bold">Gemeindezentrum</span> der Evangelischen Kirchengemeinde in Bühl
-			</p>
-			<h2 class="bold">Klimaschutz ist Bewahrung der Schöpfung</h2>
+			</div>
+			<h2 class="bold">Es geht um Klimaschutz und Bewahrung der Schöpfung, aber auch um die Zukunftsfähigkeit unseres Gebäudes</h2>
 			<p>
-				Und davon hat auch die Kirche ihren Beitrag zu leisten. Schon in der frühen Planungsphase wurde das Augenmerk auf die regenerative Energie gerichtet. Alle Neubauten bekommen eine Fußbodenheizung, die Kirche ein neues Heizregister und die energetisch sanierten Bestandsgebäude die Möglichkeit, die Vorlaufstemperatur zu reduzieren. Damit ist es möglich, über <span class="blue bold">80 kW Wärmepumpen</span>, <span class="blue bold">3.000 l Wasserspeicher</span> und eine <span class="blue bold">99 kWp PV-Anlage</span> die Versorgung nachhaltig zu betreiben. Im Jahresmittel produzieren wir mehr regenerative Energie als verbraucht wird und leisten damit einen klimapositiven Beitrag.
+				Dazu wollen wir als Kirchengemeinde unseren Beitrag leisten.
+				Schon früh wurde das Augenmerk auf die regenerative Energie gerichtet.
+				Alle Neubauten bekommen eine Fußbodenheizung, die Kirche ein neues Heizregister und die energetisch sanierten Bestandsgebäude die Möglichkeit, die Vorlaufstemperatur zu reduzieren.
+				Damit ist es möglich, über <span class="bold blue">80 kW Wärmepumpen</span>, <span class="bold blue">3.000 l Wasserspeicher</span> und eine <span class="bold blue">99 kWp PV-Anlage</span> die Versorgung nachhaltig zu betreiben.
+				Im Jahresmittel produzieren wir mehr regenerative Energie als verbraucht wird und leisten damit einen klimapositiven Beitrag, der uns auf Dauer auch finanziell zugutekommen wird. 
 			</p>
 			<div id="psalm-container">
 				<BaseImageCredit style="width: 100%;" src="/external/solar_peterschreiber.media - istockphoto.com.webp" credit="peterschreiber.media - iStockphoto.com" alt="Aufnahme einer Fläche von Photovoltaik-Elemente. Die tiefstehende Sonne scheint von hinten über die Oberkante der Panele" />
@@ -87,15 +91,17 @@
 				<BaseImageTitle id="real-green-award" class="float-right" src="/external/real-green-award.webp" alt='Preis mit der Aufschrift "REAL GREEN AWARD - Gewinner Jury Award 2022 Evangelische Kirchengemeinde Bühl"'>
 					Eine mit dem <span class="blue bold">REAL GREEN AWARD 2022</span> ausgezeichnete Idee steht kurz vor der Realisierung
 				</BaseImageTitle>
-				In dieses biblische Lied stimmen wir als Kirchengemeinde gerne ein und fügen in Zukunft hinzu <span class="blue bold">„… und seien unsere Energiespeicher gut gefüllt“</span>. Denn in der Tat ist die Sonne ein Gottesgeschenk. Auch als wunderbarer „Lieferant“ für alle Energie und Wärme, die wir in unserem erneuerten Gemeindezentrum brauchen und die wir in Zukunft nicht mehr auf Kosten einer negativen CO<sub>2</sub>-Bilanz erzeugen wollen.
+				In dieses biblische Lied stimmen wir als Kirchengemeinde gerne ein und fügen in Zukunft hinzu <span class="blue bold">„… und seien unsere Energiespeicher gut gefüllt“</span>.
+				Denn in der Tat ist die Sonne ein Gottesgeschenk.
+				Auch als wunderbarer „Lieferant“ für alle Energie und Wärme, die wir in unserem erneuerten Gemeindezentrum brauchen und die wir in Zukunft nicht mehr auf Kosten einer negativen CO<sub>2</sub>-Bilanz erzeugen wollen.
 			</p>
 			<p>
 				Wer trägt bei zur energetischen Sanierung unseres Gemeindezentrums?
 				Wer hilft uns dabei, sauber und sicher Energie über die beiden Wärmepumpen zu produieren?
 				Wer trägt dazu bei, unser Gemeindezentrum gut für die Zukunft aufzustellen und – auch im übertragenen Sinn – mehr Licht und Wärme in unsere Stadt zu bringen?
 			</p>
-			<h3>
-				Die 7 wichtigsten Maßnahmen auf dem Web zur KlimaPlus-Kirche:
+			<h3 class="green">
+				Die 7 wichtigsten Maßnahmen auf dem Web zum <span class="upper blue">KlimaPlus-Gemeindezentrum</span>
 			</h3>
 			<ol>
     			<li>Das konsequente Dämmen der Gebäudehülle mit neuen Fenster- und Glasfassaden und einer neuen Dämmung des Kirchen- und Saaldachs.</li>
@@ -248,7 +254,9 @@
 		max-width: min(40em, 100%);
 
 		padding-inline: 0.25em;
+	}
 
+	#text-content > p {
 		text-align: justify;
 	}
 
