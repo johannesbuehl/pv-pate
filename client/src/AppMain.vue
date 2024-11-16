@@ -61,6 +61,11 @@
 
 <template>
 	<AppLayout>
+		<h1 class="red upper">
+			Dies ist eine interne Test-Seite.
+			Die hier aufgelisteten Informationen sind im stetigen Wandel und entsprechen möglicherweise nicht der Wahrheit.
+			Tätigen Sie keine Spenden im unten aufgeführten Kontext.
+		</h1>
 		<div id="text-content">
 			<img id="header" src="/external/header_logo.svg" alt='Logo der evangelischen Kirchengemeinde Bühl "gemeinsam glauben leben" und dem Titel "WIR BAUEN GEMEINDE - FÜR LEUTE UND MORGEN - klimafreundlich"' />
 			<div class="center">
