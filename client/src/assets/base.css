@@ -1,24 +1,17 @@
 @font-face {
-    font-family: 'Oxygen';
-    font-display: swap;
-    src:     url('/assets/Oxygen-Regular.ttf');
+	font-family: "Oxygen";
+	font-display: swap;
+	src: url("/assets/Oxygen-Regular.ttf");
 }
 @font-face {
-    font-family: 'Oxygen';
-    font-display: swap;
+	font-family: "Oxygen";
+	font-display: swap;
 	font-weight: bold;
-    src:     url('/assets/Oxygen-Bold.ttf');
+	src: url("/assets/Oxygen-Bold.ttf");
 }
 
 /* semantic color variables for this project */
 :root {
-	--v-color-blue: hsl(208, 75%, 41%);
-	--v-color-green: hsl(95, 59%, 43%);
-	--v-color-orange: hsl(36, 100%, 48%);
-	--v-color-white: white;
-	--v-color-black: black;
-
-
 	--font-default: Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif;
 	--font-header: Oxygen, sans-serif;
 
@@ -31,76 +24,4 @@
 
 	--filter-battery-sold: saturate(0.25) brightness(1.125);
 	--filter-battery-sold-hover: saturate(0.25) brightness(0.75);
-}
-
-.blue {
-	color: var(--v-color-blue);
-}
-
-.green {
-	color: var(--v-color-green);
-}
-
-.orange {
-	color: var(--v-color-orange);
-}
-
-.white {
-	color: var(--v-color-white);
-}
-
-.black {
-	color: var(--v-color-black);
-}
-
-.red {
-	color: red;
-}
-
-.bold {
-	font-weight: bold;
-}
-
-.upper {
-	text-transform: uppercase;
-}
-
-.bg-orange {
-	background-color: var(--v-color-orange);
-}
-
-.left {
-	text-align: left;
-}
-
-.right {
-	text-align: right;
-}
-
-.center {
-	text-align: center;
-}
-
-.nowrap {
-	text-wrap: nowrap;
-}
-
-.small {
-	font-size: 0.67em;
-}
-
-@media screen and (min-width: 600px) {
-	.float-right {
-		float: right;
-
-		margin-top: 0.25em;
-		margin-left: 1.5em;
-	}
-
-	.float-left {
-		float: left;
-
-		margin-top: 0.25em;
-		margin-right: 1.5em;
-	}
 }

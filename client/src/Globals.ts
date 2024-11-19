@@ -15,7 +15,7 @@ void (async () => {
 	const reserved_elements_request = api_call<ElementsDB>("GET", "elements");
 
 	if ((await reserved_elements_request).ok) {
-		elements_db.value = (await (await reserved_elements_request).json())
+		elements_db.value = await (await reserved_elements_request).json();
 	}
 })();
 
@@ -36,4 +36,4 @@ void (async () => {
 	if (response.status === HTTPStatus.OK) {
 		user.value = await response.json();
 	}
-})()
+})();

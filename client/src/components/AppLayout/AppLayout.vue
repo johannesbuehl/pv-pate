@@ -1,13 +1,13 @@
 <script setup lang="ts">
-	import { faBars, faPowerOff } from '@fortawesome/free-solid-svg-icons';
-	import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+	import { faBars, faPowerOff } from "@fortawesome/free-solid-svg-icons";
+	import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
-	import { user, type User } from '@/Globals';
-	import { api_call } from '@/lib';
+	import { user, type User } from "@/Globals";
+	import { api_call } from "@/lib";
 
-	import LayoutHeaderFooter from './LayoutHeaderFooter.vue';
-	import BaseButton from '../BaseButton.vue';
-	import { ref } from 'vue';
+	import LayoutHeaderFooter from "./LayoutHeaderFooter.vue";
+	import BaseButton from "../BaseButton.vue";
+	import { ref } from "vue";
 
 	const hamburger_menu = ref<boolean>(false);
 
@@ -34,26 +34,24 @@
 <template>
 	<LayoutHeaderFooter v-if="user?.logged_in || !is_home('/')" id="header">
 		<template #left>
-			<BaseButton id="hamburger-toggle" :class="{ active: hamburger_menu }" :square="true" @click="hamburger_menu = !hamburger_menu"><FontAwesomeIcon id="hamburger-icon" :icon="faBars" /></BaseButton>
+			<BaseButton
+				id="hamburger-toggle"
+				:class="{ active: hamburger_menu }"
+				:square="true"
+				@click="hamburger_menu = !hamburger_menu"
+				><FontAwesomeIcon id="hamburger-icon" :icon="faBars"
+			/></BaseButton>
 		</template>
-		<div
-			id="header-content"
-			:class="{ visible: hamburger_menu }"
-			@click="hamburger_menu = false"
-		>
+		<div id="header-content" :class="{ visible: hamburger_menu }" @click="hamburger_menu = false">
 			<a v-if="!is_home('/')" href="/">Home</a>
-			
-			<template
-				v-if="user?.logged_in"
-			>
+
+			<template v-if="user?.logged_in">
 				<a v-if="!is_home('/admin')" href="/admin">Admin</a>
-			
+
 				<slot name="header"></slot>
 			</template>
 		</div>
-		<template #right
-			v-if="user?.logged_in"
-		>
+		<template #right v-if="user?.logged_in">
 			<a @click="logout"><FontAwesomeIcon :icon="faPowerOff" /></a>
 		</template>
 	</LayoutHeaderFooter>
@@ -74,7 +72,7 @@
 	#hamburger-toggle {
 		display: none;
 	}
-	
+
 	#hamburger-icon {
 		transition: transform 0.5s ease;
 	}

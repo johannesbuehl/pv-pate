@@ -7,16 +7,16 @@
 </script>
 
 <script setup lang="ts">
-	import { faPlus, faSdCard, faTrash } from '@fortawesome/free-solid-svg-icons';
-	import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-	import { onMounted, ref } from 'vue';
+	import { faPlus, faSdCard, faTrash } from "@fortawesome/free-solid-svg-icons";
+	import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+	import { onMounted, ref } from "vue";
 
-	import BaseButton from './BaseButton.vue';
-	import { api_call } from '@/lib';
-	import type { User } from '@/Globals';
+	import BaseButton from "./BaseButton.vue";
+	import { api_call } from "@/lib";
+	import type { User } from "@/Globals";
 
 	interface PasswordUser extends User {
-		password: string
+		password: string;
 	}
 
 	const add_user_name_input = ref<string>("");
@@ -57,7 +57,7 @@
 			});
 
 			if (response.ok) {
-				store_users(await response.json())
+				store_users(await response.json());
 
 				// clear the input-boxes
 				add_user_name_input.value = "";
@@ -80,7 +80,12 @@
 
 	async function modify_user(user: PasswordUser) {
 		if (validate_password(user.password)) {
-			const response = await api_call<User[]>("PATCH", "users", { uid: user.uid }, { password: user.password });
+			const response = await api_call<User[]>(
+				"PATCH",
+				"users",
+				{ uid: user.uid },
+				{ password: user.password }
+			);
 
 			if (response.ok) {
 				users.value = await response.json();
@@ -90,20 +95,35 @@
 </script>
 
 <template>
-	<div id="admin-wrapper">
+	<div class="m-2 flex max-w-full flex-col items-center gap-2">
 		<h1>Benutzer</h1>
-		<div id="add-user-wrapper">
-			<div id="add-user-wrapper-inputs">
-				Benutzername: <input type="text" name="username" autocomplete="off" v-model="add_user_name_input" placeholder="username" />
-				Passwort: <input type="text" name="password" v-model="add_user_password_input" placeholder="password" />
+		<div class="flex items-center gap-4">
+			<div class="flex grid-cols-[auto_auto] flex-col sm:grid sm:gap-2">
+				Benutzername:
+				<input
+					class="flex-1 rounded px-2 outline outline-1 invalid:text-red-500"
+					type="text"
+					name="username"
+					autocomplete="off"
+					v-model="add_user_name_input"
+					placeholder="username"
+				/>
+				Passwort:
+				<input
+					class="flex-1 rounded px-2 outline outline-1 invalid:text-red-500"
+					type="text"
+					name="password"
+					v-model="add_user_password_input"
+					placeholder="password"
+				/>
 			</div>
 			<BaseButton :disabled="!validate_new_user()" :square="true" @click="add_user">
 				<FontAwesomeIcon :icon="faPlus" />
 			</BaseButton>
 		</div>
-		<div id="modify-user-wrapper">
-			<table id="users">
-				<thead>
+		<div class="max-w-full overflow-x-auto">
+			<table class="max-w-160">
+				<thead class="bg-black text-white">
 					<tr>
 						<th>UID</th>
 						<th>Name</th>
@@ -113,31 +133,35 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr v-for="user of users" :key="user.uid">
+					<tr v-for="user of users" :key="user.uid" class="odd:bg-stone-300 even:bg-stone-100">
 						<th>{{ user.uid }}</th>
 						<th>{{ user.name }}</th>
 						<th>
-							<div class="cell">
-								<input type="text" name="new-password" v-model="user.password" placeholder="Neues Passwort" />
-							</div>
+							<input
+								class="rounded px-2 text-sm outline outline-2"
+								type="text"
+								name="new-password"
+								v-model="user.password"
+								placeholder="Neues Passwort"
+							/>
 						</th>
 						<th>
-							<div class="cell">
-								<BaseButton class="button" :disabled="!validate_password(user.password)" :square="true" @click="modify_user(user)"
-									><FontAwesomeIcon :icon="faSdCard"
-								/></BaseButton>
-							</div>
+							<BaseButton
+								class="button mx-auto"
+								:disabled="!validate_password(user.password)"
+								:square="true"
+								@click="modify_user(user)"
+								><FontAwesomeIcon :icon="faSdCard"
+							/></BaseButton>
 						</th>
 						<th>
-							<div class="cell">
-								<BaseButton
-									class="button"
-									:disabled="user.name === 'admin'"
-									:square="true" 
-									@click="delete_user(user)"
-									><FontAwesomeIcon :icon="faTrash"
-								/></BaseButton>
-							</div>
+							<BaseButton
+								class="button mx-auto"
+								:disabled="user.name === 'admin'"
+								:square="true"
+								@click="delete_user(user)"
+								><FontAwesomeIcon :icon="faTrash"
+							/></BaseButton>
 						</th>
 					</tr>
 				</tbody>
@@ -147,85 +171,11 @@
 </template>
 
 <style scoped>
-	#admin-wrapper {
-		display: flex;
-		flex-direction: column;
-
-		align-items: center;
-		gap: 0.5em;
-
-		margin: 0.5em;
-
-		max-width: 100%;
-	}
-
-	#add-user-wrapper {
-		display: flex;
-		align-items: center;
-
-		gap: 1em;
-	}
-
-
-
-	#add-user-wrapper-inputs {
-		display: grid;
-
-		grid-template-columns: auto auto;
-
-		column-gap: 0.5em;
-	}
-
-	@media screen and (max-width: 600px) {
-		#add-user-wrapper-inputs {
-			display: flex;
-			flex-direction: column;
-		}
-	}
-	
-	#users {
-		max-width: 40em;
-	}
-
-	#modify-user-wrapper {
-		max-width: 100%;
-		overflow-x: auto;
-	}
-
-	thead th {
-		font-weight: bold;
-
-		background-color: black;
-		color: white;
-	}
-
-	tbody > tr:nth-of-type(2n) {
-		background-color: hsl(0, 0%, 90%);
-	}
-
-	tbody > tr:nth-of-type(2n + 1) {
-		background-color: hsl(0, 0%, 80%);
-	}
-
 	th {
-		padding: 0.25em;
-
-		font-weight: normal;
+		@apply p-1;
 	}
 
-	th > div.cell {
-		width: 100%;
-
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
-
-	th input[type="text"] {
-		flex: 1;
-	}
-
-	tbody > tr input[type="text"] {
-		font-size: 0.67em;
+	tbody th {
+		@apply font-normal;
 	}
 </style>

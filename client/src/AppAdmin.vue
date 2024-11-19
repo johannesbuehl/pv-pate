@@ -9,28 +9,32 @@
 </script>
 
 <script setup lang="ts">
-	import { ref, watch } from 'vue';
-	
-	import AdminUsers from './components/AdminUsers.vue';
-	import AdminLogin from './components/AdminLogin.vue';
-	import AdminAccount from './components/AdminAccount.vue';
-	import AppLayout from './components/AppLayout/AppLayout.vue';
-	import AdminReservations from './components/AdminReservations.vue';
-	import AdminSponsorships from './components/AdminSponsorships.vue';
-	import { user } from './Globals';
-	import { is_element_available } from './lib';
-	import type { Element } from './components/BasePV.vue';
+	import { ref, watch } from "vue";
+
+	import AdminUsers from "./components/AdminUsers.vue";
+	import AdminLogin from "./components/AdminLogin.vue";
+	import AdminAccount from "./components/AdminAccount.vue";
+	import AppLayout from "./components/AppLayout/AppLayout.vue";
+	import AdminReservations from "./components/AdminReservations.vue";
+	import AdminSponsorships from "./components/AdminSponsorships.vue";
+	import { user } from "./Globals";
+	import { is_element_available } from "./lib";
+	import type { Element } from "./components/BasePV.vue";
 
 	const window_state = ref<WindowState>(WindowState.Login);
 	const selected_element = ref<Element>();
 
-	watch(user, user => {
-			window_state.value = user?.logged_in ? WindowState.Reservations : WindowState.Login
-	}, { deep: true });
+	watch(
+		user,
+		(user) => {
+			window_state.value = user?.logged_in ? WindowState.Reservations : WindowState.Login;
+		},
+		{ deep: true }
+	);
 
 	watch(selected_element, () => {
 		if (!!selected_element.value && is_element_available(selected_element.value?.mid)) {
-			console.debug("is free")
+			console.debug("is free");
 
 			selected_element.value = undefined;
 		}
@@ -40,10 +44,31 @@
 <template>
 	<AppLayout>
 		<template #header>
-			<a class="navbar-item" :class="{ active: window_state === WindowState.Reservations }" @click="window_state = WindowState.Reservations">Reservierungen</a>
-			<a class="navbar-item" :class="{ active: window_state === WindowState.Sponsorships }" @click="window_state = WindowState.Sponsorships">Patenschaften</a>
-			<a class="navbar-item" :class="{ active: window_state === WindowState.Account }" @click="window_state = WindowState.Account">Account</a>
-			<a v-if="user?.name === 'admin'" class="navbar-item" :class="{ active: window_state === WindowState.Users }" @click="window_state = WindowState.Users">Benutzer</a>
+			<a
+				class="navbar-item"
+				:class="{ 'font-bold underline': window_state === WindowState.Reservations }"
+				@click="window_state = WindowState.Reservations"
+				>Reservierungen</a
+			>
+			<a
+				class="navbar-item"
+				:class="{ 'font-bold underline': window_state === WindowState.Sponsorships }"
+				@click="window_state = WindowState.Sponsorships"
+				>Patenschaften</a
+			>
+			<a
+				class="navbar-item"
+				:class="{ 'font-bold underline': window_state === WindowState.Account }"
+				@click="window_state = WindowState.Account"
+				>Account</a
+			>
+			<a
+				v-if="user?.name === 'admin'"
+				class="navbar-item"
+				:class="{ active: window_state === WindowState.Users }"
+				@click="window_state = WindowState.Users"
+				>Benutzer</a
+			>
 		</template>
 		<AdminLogin v-if="window_state === WindowState.Login" v-model="user" />
 		<AdminReservations v-else-if="window_state === WindowState.Reservations" />
@@ -54,15 +79,9 @@
 </template>
 
 <style scoped>
-	.navbar-item.active {
-		text-decoration: underline;
-
-		font-weight: bold;
-	}
-
 	#tooltip-content {
 		display: flex;
-		
+
 		align-items: center;
 
 		gap: 0.25em;

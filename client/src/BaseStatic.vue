@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import AppLayout from '@/components/AppLayout/AppLayout.vue';
-
+	import AppLayout from "@/components/AppLayout/AppLayout.vue";
 </script>
 
 <template>
@@ -8,13 +7,13 @@ import AppLayout from '@/components/AppLayout/AppLayout.vue';
 		<div id="wrapper">
 			<slot></slot>
 		</div>
-	</AppLayout>	
+	</AppLayout>
 </template>
 
 <style scoped>
 	#wrapper {
 		max-width: 40em;
-		
+
 		overflow-wrap: anywhere;
 	}
 

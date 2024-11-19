@@ -5,22 +5,20 @@
 
 	import { api_call, HTTPStatus } from "@/lib";
 	import type { UserLogin } from "@/Globals";
-	
+
 	import BaseButton from "./BaseButton.vue";
 
 	const user_input = ref<string>("");
 	const password_input = ref<string>("");
 	const wrong_password = ref<boolean>(false);
 
-	const user = defineModel<UserLogin>()
+	const user = defineModel<UserLogin>();
 
 	async function login() {
-		const response = await api_call<UserLogin>(
-			"POST",
-			"login",
-			undefined,
-			{ user: user_input.value, password: password_input.value }
-		);
+		const response = await api_call<UserLogin>("POST", "login", undefined, {
+			user: user_input.value,
+			password: password_input.value
+		});
 
 		if (response.ok) {
 			wrong_password.value = false;
@@ -63,9 +61,7 @@
 				placeholder="Passwort"
 				@keydown.enter="login"
 			/>
-			<BaseButton @click="login"
-				><FontAwesomeIcon :icon="faRightToBracket" /> Login</BaseButton
-			>
+			<BaseButton @click="login"><FontAwesomeIcon :icon="faRightToBracket" /> Login</BaseButton>
 		</form>
 	</div>
 </template>

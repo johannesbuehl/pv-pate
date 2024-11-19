@@ -1,16 +1,12 @@
 <script setup lang="ts">
-import { faCheck } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+	import { faCheck } from "@fortawesome/free-solid-svg-icons";
+	import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 	const checked = defineModel<boolean>();
 </script>
 
 <template>
-	<div
-		@click="checked = !checked"
-		id="checkbox-wrapper"
-		:class="{ checked }"
-	>
+	<div @click="checked = !checked" id="checkbox-wrapper" :class="{ checked }">
 		<FontAwesomeIcon :icon="faCheck" />
 	</div>
 </template>
@@ -32,7 +28,9 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 		cursor: pointer;
 
-		transition: border 0.2s, background-color 0.2s;
+		transition:
+			border 0.2s,
+			background-color 0.2s;
 	}
 
 	#checkbox-wrapper:hover {

@@ -1,9 +1,13 @@
 <script lang="ts">
-	export interface Element { mid: string; name?: string; reserved?: boolean; }
+	export interface Element {
+		mid: string;
+		name?: string;
+		reserved?: boolean;
+	}
 
 	const element_type_map: Record<string, string> = {
-			pv: "PV-Modul",
-			bs: "Batteriespeicher"
+		pv: "PV-Modul",
+		bs: "Batteriespeicher"
 	};
 	const dieses_element_type_map: Record<string, string> = {
 		pv: "dieses PV-Modul",
@@ -23,21 +27,21 @@
 		l: "Ostdach",
 		r: "Westdach",
 		v: "Süddach"
-	}
+	};
 
 	export function get_element_string(mid: string): string {
 		// handle batteries extra
 		if (mid.slice(0, 2) === "bs") {
 			return `${get_element_type(mid)} ${mid.slice(3).toUpperCase()}`;
-		} else {	
+		} else {
 			const mid_row = mid.slice(3, 4);
-			
+
 			for (let row of Object.keys(row_roof_map)) {
 				if (mid_row <= row) {
 					return `${get_element_type(mid)} ${mid.slice(3).toUpperCase()}`;
 				}
 			}
-			
+
 			return mid_row;
 		}
 	}
@@ -48,10 +52,10 @@
 		// add the roof for pv-modules
 		if (mid.slice(0, 2) === "pv") {
 			const mid_row = mid.slice(3, 4);
-			
+
 			for (let [row, roof] of Object.entries(row_roof_map)) {
 				if (mid_row <= row) {
-					return_string += ` (${roof})`
+					return_string += ` (${roof})`;
 
 					break;
 				}
@@ -62,10 +66,10 @@
 </script>
 
 <script setup lang="ts">
-	import { onBeforeMount, onMounted, onUnmounted, ref } from 'vue';
-	
-	import BaseTooltip from './BaseTooltip.vue';
-	import { is_element_available, get_element } from '@/lib';
+	import { onBeforeMount, onMounted, onUnmounted, ref } from "vue";
+
+	import BaseTooltip from "./BaseTooltip.vue";
+	import { is_element_available, get_element } from "@/lib";
 
 	const svg = ref<string>();
 
@@ -81,7 +85,7 @@
 		const svg_request = fetch(svg_path);
 
 		if ((await svg_request).ok) {
-			svg.value = await (await svg_request).text()
+			svg.value = await (await svg_request).text();
 		}
 	});
 
@@ -107,15 +111,19 @@
 			if (!is_element_available(ele.id)) {
 				ele.classList.add("sold");
 			}
-		}
+		};
 
 		// select all elements
-		const elements: SVGPathElement[] = Array.from(svg_dom.querySelectorAll<SVGPathElement>("[id^='pv-']"));
-		elements.forEach(element => prepare_element(element, "module"));
+		const elements: SVGPathElement[] = Array.from(
+			svg_dom.querySelectorAll<SVGPathElement>("[id^='pv-']")
+		);
+		elements.forEach((element) => prepare_element(element, "module"));
 
 		// select all batteries
-		const batteries: SVGPathElement[] = Array.from(svg_dom.querySelectorAll<SVGPathElement>("[id^='bs-']"))
-		batteries.forEach(element => prepare_element(element, "battery"));
+		const batteries: SVGPathElement[] = Array.from(
+			svg_dom.querySelectorAll<SVGPathElement>("[id^='bs-']")
+		);
+		batteries.forEach((element) => prepare_element(element, "battery"));
 
 		let svg_string = new XMLSerializer().serializeToString(svg_dom);
 
@@ -144,27 +152,12 @@
 </script>
 
 <template>
-	<div
-		id="wrapper"
-	>
-		<div
-			v-if="!!svg"
-			id="div-svg"
-			ref="svg_wrapper"
-			v-html="prepare_svg(svg)"
-		></div>
+	<div id="wrapper">
+		<div v-if="!!svg" id="div-svg" ref="svg_wrapper" v-html="prepare_svg(svg)"></div>
 	</div>
 	<Transition>
-		<div
-			v-if="selected_element"
-			id="tooltip-wrapper"
-			ref="tooltip"
-			@click="hide_tooltip"
-		>
-			<BaseTooltip
-				id="tooltip"
-				@close="hide_tooltip"
-			>
+		<div v-if="selected_element" id="tooltip-wrapper" ref="tooltip" @click="hide_tooltip">
+			<BaseTooltip id="tooltip" @close="hide_tooltip">
 				<template #header>
 					<slot name="header"></slot>
 				</template>
@@ -214,7 +207,6 @@
 	.v-enter-from,
 	.v-leave-to {
 		filter: opacity(0);
-
 	}
 </style>
 
@@ -235,7 +227,7 @@
 
 	svg#main-content .fill {
 		cursor: pointer;
-		
+
 		transition: filter 0.1s;
 	}
 
@@ -256,7 +248,7 @@
 		filter: var(--filter-module-sold-hover);
 	}
 
-	/* battery */	
+	/* battery */
 	svg#main-content .battery:hover .fill,
 	svg#main-content .battery:hover.fill {
 		filter: var(--filter-battery-hover);
@@ -267,7 +259,7 @@
 	svg#main-content .battery.sold.fill {
 		filter: var(--filter-battery-sold);
 	}
-	
+
 	svg#main-content .battery.sold:hover .fill,
 	svg#main-content .battery.sold:hover.fill {
 		filter: var(--filter-battery-sold-hover);

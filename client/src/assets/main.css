@@ -1,4 +1,7 @@
-@import './base.css';
+@import "./base.css";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 *,
 *::before,
@@ -6,16 +9,19 @@
 	box-sizing: border-box;
 }
 
-input, button {
+input,
+button {
 	font-size: 1em;
+}
+
+html {
+	font-size: 1.5em;
 }
 
 body {
 	font-family: var(--font-default);
 
 	margin: 0;
-
-	font-size: 1.5em;
 
 	text-rendering: optimizeLegibility;
 	-webkit-font-smoothing: antialiased;
@@ -35,16 +41,22 @@ a:active {
 	color: unset;
 }
 
-p, ul {
+p,
+ul {
 	margin: unset;
 }
 
-h1, h2, h3, h4, h5, h6 {
-	color: var(--v-color-blue);
-}
-
-
-/* @media (width <= 100em) {
-	body {
+@layer base {
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6 {
+		@apply font-bold text-blue;
 	}
-} */
+
+	h1 {
+		@apply text-4xl;
+	}
+}

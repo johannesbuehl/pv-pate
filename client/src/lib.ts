@@ -64,25 +64,25 @@ export type APICallResult<T extends object> = Response & { json: () => Promise<T
 export async function api_call<K extends object>(
 	method: "GET",
 	api: string,
-	params?: QueryParams,
+	params?: QueryParams
 ): Promise<APICallResult<K>>;
 export async function api_call<K extends object>(
 	method: "POST" | "PATCH",
 	api: string,
 	params?: QueryParams,
-	body?: object,
+	body?: object
 ): Promise<APICallResult<K>>;
 export async function api_call<K extends object>(
 	method: "DELETE",
 	api: string,
 	params?: QueryParams,
-	body?: object,
+	body?: object
 ): Promise<APICallResult<K>>;
 export async function api_call<K extends object>(
 	method: "GET" | "POST" | "PATCH" | "DELETE",
 	api: string,
 	params?: QueryParams,
-	body?: object,
+	body?: object
 ): Promise<APICallResult<K>> {
 	let url = window.origin + "/api/" + api;
 
@@ -131,7 +131,7 @@ export function get_element(mid: string): Element {
 		return {
 			mid,
 			reserved: true
-		}
+		};
 	}
 
 	return {
